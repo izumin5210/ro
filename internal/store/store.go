@@ -9,7 +9,8 @@ import (
 )
 
 const (
-	keyDelimiter = ":"
+	keyDelimiter   = ":"
+	scoreDelimiter = "/"
 )
 
 // ConcreteStore is an implementation of types.Store
@@ -38,7 +39,37 @@ func (s *ConcreteStore) Set(src types.Model) error {
 	conn := s.getConn()
 	defer conn.Close()
 
-	_, err = conn.Do("HMSET", redis.Args{}.Add(s.getKey(src)).AddFlat(src)...)
+	key := s.getKey(src)
+
+	err = conn.Send("MULTI")
+	if err != nil {
+		return err
+	}
+	err = conn.Send("HMSET", redis.Args{}.Add(key).AddFlat(src)...)
+	if err != nil {
+		return err
+	}
+	prefix := s.getKeyPrefix(src)
+	for k, scorer := range s.ScorerFuncMap {
+		fnv := reflect.ValueOf(scorer)
+		rv := fnv.Call([]reflect.Value{reflect.ValueOf(src)})[0]
+		var v float64
+		switch rv.Kind() {
+		case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+			v = float64(rv.Int())
+		case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
+			v = float64(rv.Uint())
+		case reflect.Float32, reflect.Float64:
+			v = rv.Float()
+		default:
+			return fmt.Errorf("post %v score %q of is %v, it is invalid(type is %v)", src, k, rv.Interface(), rv.Type())
+		}
+		err = conn.Send("ZADD", prefix+scoreDelimiter+k, v, key)
+		if err != nil {
+			return err
+		}
+	}
+	_, err = conn.Do("EXEC")
 	return err
 }
 
@@ -58,13 +89,16 @@ func (s *ConcreteStore) Get(dest types.Model) error {
 	return nil
 }
 
-func (s *ConcreteStore) getKey(m types.Model) string {
+func (s *ConcreteStore) getKeyPrefix(m types.Model) string {
 	prefix := m.GetKeyPrefix()
 	if len(prefix) == 0 {
 		prefix = s.modelType.Name()
 	}
-	suffix := m.GetKeySuffix()
-	return prefix + keyDelimiter + suffix
+	return prefix
+}
+
+func (s *ConcreteStore) getKey(m types.Model) string {
+	return s.getKeyPrefix(m) + keyDelimiter + m.GetKeySuffix()
 }
 
 func (s *ConcreteStore) validate(m types.Model) error {
