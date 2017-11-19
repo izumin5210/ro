@@ -44,9 +44,9 @@ func TestSet(t *testing.T) {
 	}
 
 	cnf := &types.StoreConfig{
-		ScorerFuncMap: map[string]interface{}{
-			"recent": func(p *TestPost) int64 {
-				return p.UpdatedAt
+		ScorerFuncMap: map[string]types.ScorerFunc{
+			"recent": func(m types.Model) interface{} {
+				return m.(*TestPost).UpdatedAt
 			},
 		},
 	}

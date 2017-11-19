@@ -50,21 +50,8 @@ func (s *ConcreteStore) Set(src types.Model) error {
 		return err
 	}
 	prefix := s.getKeyPrefix(src)
-	for k, scorer := range s.ScorerFuncMap {
-		fnv := reflect.ValueOf(scorer)
-		rv := fnv.Call([]reflect.Value{reflect.ValueOf(src)})[0]
-		var v float64
-		switch rv.Kind() {
-		case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
-			v = float64(rv.Int())
-		case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
-			v = float64(rv.Uint())
-		case reflect.Float32, reflect.Float64:
-			v = rv.Float()
-		default:
-			return fmt.Errorf("post %v score %q of is %v, it is invalid(type is %v)", src, k, rv.Interface(), rv.Type())
-		}
-		err = conn.Send("ZADD", prefix+scoreDelimiter+k, v, key)
+	for k, f := range s.ScorerFuncMap {
+		err = conn.Send("ZADD", prefix+scoreDelimiter+k, f(src), key)
 		if err != nil {
 			return err
 		}

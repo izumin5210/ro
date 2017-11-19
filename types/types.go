@@ -21,8 +21,11 @@ type Store interface {
 
 // StoreConfig contains configurations of a store
 type StoreConfig struct {
-	ScorerFuncMap map[string]interface{}
+	ScorerFuncMap map[string]ScorerFunc
 }
 
 // StoreOption configures a store
 type StoreOption func(c *StoreConfig) *StoreConfig
+
+// ScorerFunc is an adapteer to calculate score from given model
+type ScorerFunc func(Model) interface{}
