@@ -18,3 +18,11 @@ type Store interface {
 	Set(src Model) error
 	Get(dest Model) error
 }
+
+// StoreConfig contains configurations of a store
+type StoreConfig struct {
+	ScorerFuncMap map[string]interface{}
+}
+
+// StoreOption configures a store
+type StoreOption func(c *StoreConfig) *StoreConfig
