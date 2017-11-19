@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/garyburd/redigo/redis"
+	"github.com/izumin5210/ro/types"
 	dockertest "gopkg.in/ory-am/dockertest.v3"
 )
 
@@ -32,15 +33,18 @@ func (p *TestPost) GetKeySuffix() string {
 // ================================================================
 
 func TestSet(t *testing.T) {
-	store := New(redisPool.Get, &TestPost{})
-
 	post := &TestPost{
 		ID:    1,
 		Title: "post 1",
 		Body:  "This is a post 1.",
 	}
-	wantKey := "TestPost:1"
-	err := store.Set(post)
+
+	cnf := &types.StoreConfig{}
+	store, err := New(redisPool.Get, &TestPost{}, cnf)
+	if err != nil {
+		t.Errorf("Unexpected error: %v", err)
+	}
+	err = store.Set(post)
 
 	if err != nil {
 		t.Errorf("Unexpected error: %v", err)
@@ -56,11 +60,8 @@ func TestSet(t *testing.T) {
 	if got, want := len(keys), 1; err != nil {
 		t.Errorf("Stored keys was %d, want %d", got, want)
 	}
-	if got, want := keys[0], wantKey; got != want {
-		t.Errorf("Stored key was %q, want %q", got, want)
-	}
 
-	v, err := redis.Values(conn.Do("HGETALL", wantKey))
+	v, err := redis.Values(conn.Do("HGETALL", "TestPost:1"))
 	if err != nil {
 		t.Errorf("Unexpected error: %v", err)
 	}
@@ -75,7 +76,10 @@ func TestSet(t *testing.T) {
 }
 
 func TestGet(t *testing.T) {
-	store := New(redisPool.Get, &TestPost{})
+	store, err := New(redisPool.Get, &TestPost{}, &types.StoreConfig{})
+	if err != nil {
+		t.Errorf("Unexpected error: %v", err)
+	}
 
 	post := &TestPost{
 		ID:    1,
@@ -89,7 +93,7 @@ func TestGet(t *testing.T) {
 	conn.Do("HMSET", redis.Args{}.Add(key).AddFlat(post)...)
 
 	gotPost := &TestPost{ID: 1}
-	err := store.Get(gotPost)
+	err = store.Get(gotPost)
 
 	if err != nil {
 		t.Errorf("Unexpected error: %v", err)

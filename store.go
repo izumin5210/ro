@@ -11,6 +11,10 @@ type Store interface {
 }
 
 // NewStore creates a new store instance for given model objects
-func NewStore(getConnFunc types.GetConnFunc, model types.Model) Store {
-	return store.New(getConnFunc, model)
+func NewStore(getConnFunc types.GetConnFunc, model types.Model, opts ...types.StoreOption) (Store, error) {
+	cnf := &types.StoreConfig{}
+	for _, opt := range opts {
+		cnf = opt(cnf)
+	}
+	return store.New(getConnFunc, model, cnf)
 }

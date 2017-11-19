@@ -14,16 +14,18 @@ const (
 
 // ConcreteStore is an implementation of types.Store
 type ConcreteStore struct {
+	*types.StoreConfig
 	getConn   types.GetConnFunc
 	modelType reflect.Type
 }
 
 // New creates a ConcreteStore instance
-func New(getConnFunc types.GetConnFunc, model types.Model) types.Store {
+func New(getConnFunc types.GetConnFunc, model types.Model, cnf *types.StoreConfig) (types.Store, error) {
 	return &ConcreteStore{
-		getConn:   getConnFunc,
-		modelType: reflect.ValueOf(model).Elem().Type(),
-	}
+		StoreConfig: cnf,
+		getConn:     getConnFunc,
+		modelType:   reflect.ValueOf(model).Elem().Type(),
+	}, nil
 }
 
 // Set implements the types.Store interface.
