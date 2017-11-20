@@ -9,8 +9,9 @@ import (
 	"time"
 
 	"github.com/garyburd/redigo/redis"
-	"github.com/izumin5210/ro/types"
 	dockertest "gopkg.in/ory-am/dockertest.v3"
+
+	"github.com/izumin5210/ro/types"
 )
 
 // Types
@@ -35,6 +36,7 @@ func (p *TestPost) GetKeySuffix() string {
 // ================================================================
 
 func TestSet(t *testing.T) {
+	defer teardown(t)
 	now := time.Now().UTC()
 	post := &TestPost{
 		ID:        1,
@@ -109,6 +111,7 @@ func TestSet(t *testing.T) {
 }
 
 func TestGet(t *testing.T) {
+	defer teardown(t)
 	store, err := New(redisPool.Get, &TestPost{}, &types.StoreConfig{})
 	if err != nil {
 		t.Errorf("Unexpected error: %v", err)
@@ -181,4 +184,13 @@ func TestMain(m *testing.M) {
 	}
 
 	os.Exit(exitCode)
+}
+
+func teardown(t *testing.T) {
+	conn := redisPool.Get()
+	defer conn.Close()
+	_, err := conn.Do("FLUSHALL")
+	if err != nil {
+		log.Fatalf("Failed to flush redis: %s", err)
+	}
 }

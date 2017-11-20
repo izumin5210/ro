@@ -5,6 +5,7 @@ import (
 	"reflect"
 
 	"github.com/garyburd/redigo/redis"
+
 	"github.com/izumin5210/ro/types"
 )
 
@@ -17,6 +18,7 @@ const (
 type ConcreteStore struct {
 	*types.StoreConfig
 	getConn   types.GetConnFunc
+	model     types.Model
 	modelType reflect.Type
 }
 
@@ -25,6 +27,7 @@ func New(getConnFunc types.GetConnFunc, model types.Model, cnf *types.StoreConfi
 	return &ConcreteStore{
 		StoreConfig: cnf,
 		getConn:     getConnFunc,
+		model:       model,
 		modelType:   reflect.ValueOf(model).Elem().Type(),
 	}, nil
 }
