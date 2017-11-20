@@ -52,7 +52,7 @@ func main() {
 	// Post{ID: 1, Title: "post 1", Body: "This is a post 1"}
 
 	posts := []*Post{}
-	_  := store.Select(&posts, ro.Query("id").Gt(2).Lt(10))
+	_  := store.Select(&posts, store.Query("id").Gt(2).Lt(10))
 	fmt.Println("%v", posts[0])
 	// Output:
 	// Post{ID: 3, Title: "post 3", Body: "This is a post 3"}
@@ -60,7 +60,7 @@ func main() {
 	// Output:
 	// Post{ID: 2, Title: "post 2", Body: "This is a post 2"}
 
-	cnt, _ := store.Count(ro.Query("id").Gt(2))
+	cnt, _ := store.Count(store.Query("id").Gt(2))
 	fmt.Println(cnt)
 	// Output:
 	// 2
