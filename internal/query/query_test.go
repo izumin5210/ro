@@ -81,7 +81,7 @@ func TestQuery_Build(t *testing.T) {
 		{
 			q:    New(key).LtEq(10).Limit(-1).Reverse(),
 			cmd:  "ZREVRANGEBYSCORE",
-			args: []interface{}{key, "-inf", 10},
+			args: []interface{}{key, 10, "-inf"},
 		},
 		{
 			q:    New(key).GtEq(10).LtEq(15).Limit(20).Offset(15),
@@ -91,7 +91,7 @@ func TestQuery_Build(t *testing.T) {
 		{
 			q:    New(key).GtEq(10).Lt(15).Limit(20).Offset(15).Reverse(),
 			cmd:  "ZREVRANGEBYSCORE",
-			args: []interface{}{key, 10, "(15", "LIMIT", 15, 20},
+			args: []interface{}{key, "(15", 10, "LIMIT", 15, 20},
 		},
 	}
 

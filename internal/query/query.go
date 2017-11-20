@@ -53,15 +53,17 @@ func (q *Query) args() []interface{} {
 	args := []interface{}{}
 	args = append(args, q.key)
 	if q.isWithScore() {
-		if q.min == nil {
-			args = append(args, neginf)
-		} else {
-			args = append(args, q.min)
+		max, min := q.max, q.min
+		if max == nil {
+			max = inf
 		}
-		if q.max == nil {
-			args = append(args, inf)
+		if min == nil {
+			min = neginf
+		}
+		if q.reverse {
+			args = append(args, max, min)
 		} else {
-			args = append(args, q.max)
+			args = append(args, min, max)
 		}
 		if q.offset != 0 || q.limit != -1 {
 			args = append(args, "LIMIT", q.offset, q.limit)
