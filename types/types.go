@@ -29,3 +29,15 @@ type StoreOption func(c *StoreConfig) *StoreConfig
 
 // ScorerFunc is an adapteer to calculate score from given model
 type ScorerFunc func(Model) interface{}
+
+// Query is an interface to set conditions to find stored objects
+type Query interface {
+	Gt(v interface{}) Query
+	GtEq(v interface{}) Query
+	Lt(v interface{}) Query
+	LtEq(v interface{}) Query
+	Limit(v int) Query
+	Offset(v int) Query
+	Reverse() Query
+	Build() (string, []interface{})
+}
