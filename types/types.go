@@ -17,6 +17,8 @@ type Model interface {
 type Store interface {
 	Set(src Model) error
 	Get(dest Model) error
+	Select(dest interface{}, queries ...Query) error
+	Query(key string) Query
 }
 
 // StoreConfig contains configurations of a store
