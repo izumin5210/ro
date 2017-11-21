@@ -2,6 +2,7 @@ GO_PKGS := $(shell go list ./... | grep -v vendor)
 GO_SRCS := $(shell git ls-files | grep -E "\.go$$" | grep -v -E "\.pb(:?\.gw)?\.go$$")
 GO_TEST_FLAGS  := -v -race
 COVER_FILE := coverage.txt
+COVER_MODE := atomic
 
 #  Commands
 #-----------------------------------------------
@@ -21,12 +22,12 @@ test: lint
 
 .PHONY: cover
 cover:
-	@echo "" > $(COVER_FILE)
+	@echo "mode: $(COVER_MODE)" > $(COVER_FILE)
 	@for pkg in $(GO_PKGS); do \
 		tmp=/tmp/ro-coverage.out; \
-		go test $(GO_TEST_FLAGS) -coverprofile=$$tmp -covermode=atomic $$pkg; \
+		go test $(GO_TEST_FLAGS) -coverprofile=$$tmp -covermode=$(COVER_MODE) $$pkg; \
 		if [ -f $$tmp ]; then \
-			cat $$tmp >> $(COVER_FILE); \
+			cat $$tmp | tail -n +2 >> $(COVER_FILE); \
 			rm $$tmp; \
 		fi \
 	done
