@@ -26,7 +26,7 @@ cover:
 		tmp=/tmp/ro-coverage.out; \
 		go test $(GO_TEST_FLAGS) -coverprofile=$$tmp -covermode=atomic $$pkg; \
 		if [ -f $$tmp ]; then \
-			cat $$tmp >> $(COVER_FILE); \
+			cat $$tmp | tail -n +2 >> $(COVER_FILE); \
 			rm $$tmp; \
 		fi \
 	done
