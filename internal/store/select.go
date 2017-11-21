@@ -24,7 +24,6 @@ func (s *ConcreteStore) Select(dest interface{}, query types.Query) error {
 	defer conn.Close()
 
 	cmd, args := query.Build()
-	fmt.Println(cmd, args)
 	keys, err := redis.Strings(conn.Do(cmd, args...))
 	if err != nil {
 		return err

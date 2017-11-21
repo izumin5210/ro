@@ -1,12 +1,10 @@
 package store
 
 import (
-	"fmt"
 	"reflect"
 	"testing"
 	"time"
 
-	"github.com/garyburd/redigo/redis"
 	"github.com/izumin5210/ro/types"
 )
 
@@ -72,8 +70,6 @@ func TestSelect(t *testing.T) {
 
 	conn := redisPool.Get()
 	defer conn.Close()
-	keys, err := redis.Strings(conn.Do("keys", "*"))
-	fmt.Println(keys)
 
 	cases := []struct {
 		name  string
