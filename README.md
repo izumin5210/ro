@@ -1,5 +1,10 @@
-# ro: map Redis Objects to Go
+# ro: Redis Objects to Go
+[![Build Status](https://travis-ci.org/izumin5210/ro.svg?branch=master)](https://travis-ci.org/izumin5210/ro)
+[![codecov](https://codecov.io/gh/izumin5210/ro/branch/master/graph/badge.svg)](https://codecov.io/gh/izumin5210/ro)
 [![GoDoc](https://godoc.org/github.com/izumin5210/ro?status.svg)](https://godoc.org/github.com/izumin5210/ro)
+[![Go Report Card](https://goreportcard.com/badge/github.com/izumin5210/ro)](https://goreportcard.com/report/github.com/izumin5210/ro)
+[![Go project version](https://badge.fury.io/go/github.com%2Fizumin5210%2Fro.svg)](https://badge.fury.io/go/github.com%2Fizumin5210%2Fro)
+[![license](https://img.shields.io/github/license/izumin5210/ro.svg)](./LICENSE)
 
 ## Example
 
