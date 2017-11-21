@@ -8,7 +8,7 @@ import (
 	"github.com/izumin5210/ro/types"
 )
 
-func TestSelect(t *testing.T) {
+func TestCountAndSelect(t *testing.T) {
 	defer teardown(t)
 
 	cnf := &types.StoreConfig{
@@ -176,26 +176,44 @@ func TestSelect(t *testing.T) {
 		},
 	}
 
-	for _, c := range cases {
-		t.Run(c.name, func(t *testing.T) {
-			gotPosts := []*TestPost{}
-			err = store.Select(&gotPosts, c.q)
+	t.Run("Count", func(t *testing.T) {
+		for _, c := range cases {
+			t.Run(c.name, func(t *testing.T) {
+				cnt, err := store.Count(c.q)
 
-			if err != nil {
-				t.Errorf("Unexpected error: %v", err)
-			}
-
-			if got, want := len(gotPosts), len(c.order); got != want {
-				t.Errorf("Select() returned %d posts, want %d posts", got, want)
-				return
-			}
-
-			for i, j := range c.order {
-				if got, want := gotPosts[i], posts[j]; !reflect.DeepEqual(got, want) {
-					cmd, args := c.q.Build()
-					t.Errorf("Select(%v, %v)[%d] is %v, want %v", cmd, args, i, got, want)
+				if err != nil {
+					t.Errorf("Unexpected error: %v", err)
 				}
-			}
-		})
-	}
+
+				if got, want := cnt, len(c.order); got != want {
+					t.Errorf("Count() returned %d, want %d", got, want)
+				}
+			})
+		}
+	})
+
+	t.Run("Select", func(t *testing.T) {
+		for _, c := range cases {
+			t.Run(c.name, func(t *testing.T) {
+				gotPosts := []*TestPost{}
+				err = store.Select(&gotPosts, c.q)
+
+				if err != nil {
+					t.Errorf("Unexpected error: %v", err)
+				}
+
+				if got, want := len(gotPosts), len(c.order); got != want {
+					t.Errorf("Select() returned %d posts, want %d posts", got, want)
+					return
+				}
+
+				for i, j := range c.order {
+					if got, want := gotPosts[i], posts[j]; !reflect.DeepEqual(got, want) {
+						cmd, args := c.q.Build()
+						t.Errorf("Select(%v, %v)[%d] is %v, want %v", cmd, args, i, got, want)
+					}
+				}
+			})
+		}
+	})
 }
