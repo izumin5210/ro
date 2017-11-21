@@ -10,11 +10,7 @@ import (
 )
 
 // Select implements the types.Store interface.
-func (s *ConcreteStore) Select(dest interface{}, queries ...types.Query) error {
-	if len(queries) != 1 {
-		return fmt.Errorf("Select() can receive only 1 query object")
-	}
-
+func (s *ConcreteStore) Select(dest interface{}, query types.Query) error {
 	dt := reflect.ValueOf(dest)
 	if dt.Kind() != reflect.Ptr || dt.IsNil() {
 		return fmt.Errorf("must pass a slice ptr")
@@ -27,7 +23,7 @@ func (s *ConcreteStore) Select(dest interface{}, queries ...types.Query) error {
 	conn := s.getConn()
 	defer conn.Close()
 
-	cmd, args := queries[0].Build()
+	cmd, args := query.Build()
 	fmt.Println(cmd, args)
 	keys, err := redis.Strings(conn.Do(cmd, args...))
 	if err != nil {

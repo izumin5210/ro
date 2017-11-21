@@ -26,7 +26,7 @@ func main() {
 		},
 	}
 
-	store := ro.NewStore(pool, &Post{}, ro.WithScorer(PostScorerMap))
+	store := ro.New(pool, &Post{}, ro.WithScorer(PostScorerMap))
 
 	// Posts will be stored as Hash, and id and updated_at are stored as OrderedSet
 	store.Set(&Post{
