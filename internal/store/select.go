@@ -20,14 +20,13 @@ func (s *ConcreteStore) Select(dest interface{}, query types.Query) error {
 		return fmt.Errorf("must pass a slice ptr")
 	}
 
-	conn := s.getConn()
-	defer conn.Close()
-
-	cmd, args := query.Build()
-	keys, err := redis.Strings(conn.Do(cmd, args...))
+	keys, err := s.keys(query)
 	if err != nil {
 		return err
 	}
+
+	conn := s.getConn()
+	defer conn.Close()
 
 	for _, key := range keys {
 		err := conn.Send("HGETALL", key)
@@ -40,7 +39,7 @@ func (s *ConcreteStore) Select(dest interface{}, query types.Query) error {
 
 	vt := dt.Type().Elem().Elem()
 
-	for _ = range keys {
+	for range keys {
 		v, err := redis.Values(conn.Receive())
 		if err != nil {
 			return err
@@ -56,8 +55,25 @@ func (s *ConcreteStore) Select(dest interface{}, query types.Query) error {
 	return nil
 }
 
+// Count implements the types.Store interface.
+func (s *ConcreteStore) Count(query types.Query) (int, error) {
+	keys, err := s.keys(query)
+	if err != nil {
+		return 0, err
+	}
+	return len(keys), nil
+}
+
 // Query implements the types.Store interface.
 func (s *ConcreteStore) Query(key string) types.Query {
 	k := s.getKeyPrefix(s.model) + scoreDelimiter + key
 	return query.New(k)
+}
+
+func (s *ConcreteStore) keys(query types.Query) ([]string, error) {
+	conn := s.getConn()
+	defer conn.Close()
+
+	cmd, args := query.Build()
+	return redis.Strings(conn.Do(cmd, args...))
 }

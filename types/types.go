@@ -18,6 +18,7 @@ type Store interface {
 	Set(src Model) error
 	Get(dest Model) error
 	Select(dest interface{}, query Query) error
+	Count(query Query) (int, error)
 	Query(key string) Query
 }
 
