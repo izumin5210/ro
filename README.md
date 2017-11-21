@@ -5,7 +5,7 @@
 
 ```go
 type Post struct {
-	ro.Base
+	ro.Model
 	ID        uint64 `redis:"id"`
 	Title     string `redis:"title"`
 	Body      string `redis:"body"`
