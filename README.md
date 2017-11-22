@@ -34,20 +34,22 @@ func main() {
 	store := ro.New(pool, &Post{}, ro.WithScorer(PostScorerMap))
 
 	// Posts will be stored as Hash, and id and updated_at are stored as OrderedSet
-	store.Set(&Post{
-		ID: 1,
-		Title: "post 1",
-		Body: "This is a post 1",
-	})
-	store.Set(&Post{
-		ID: 2,
-		Title: "post 2",
-		Body: "This is a post 2",
-	})
-	store.Set(&Post{
-		ID: 3,
-		Title: "post 3",
-		Body: "This is a post 3",
+	store.Set([]*Post{
+		{
+			ID: 1,
+			Title: "post 1",
+			Body: "This is a post 1",
+		},
+		{
+			ID: 2,
+			Title: "post 2",
+			Body: "This is a post 2",
+		},
+		{
+			ID: 3,
+			Title: "post 3",
+			Body: "This is a post 3",
+		},
 	})
 
 	post := &Post{ID: 1}
