@@ -33,7 +33,7 @@ func New(getConnFunc types.GetConnFunc, model types.Model, cnf *types.StoreConfi
 }
 
 // Set implements the types.Store interface.
-func (s *ConcreteStore) Set(src types.Model) error {
+func (s *ConcreteStore) Set(src interface{}) error {
 	var err error
 	if err = s.validate(src); err != nil {
 		return err
