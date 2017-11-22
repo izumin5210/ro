@@ -35,32 +35,62 @@ func New(getConnFunc types.GetConnFunc, model types.Model, cnf *types.StoreConfi
 // Set implements the types.Store interface.
 func (s *ConcreteStore) Set(src interface{}) error {
 	var err error
-	if err = s.validate(src); err != nil {
-		return err
-	}
 
 	conn := s.getConn()
 	defer conn.Close()
-
-	key := s.getKey(src)
 
 	err = conn.Send("MULTI")
 	if err != nil {
 		return err
 	}
-	err = conn.Send("HMSET", redis.Args{}.Add(key).AddFlat(src)...)
+
+	rv := reflect.ValueOf(src)
+	if rv.Kind() == reflect.Slice {
+		for i := 0; i < rv.Len(); i++ {
+			err = s.set(conn, rv.Index(i))
+			if err != nil {
+				break
+			}
+		}
+	} else {
+		err = s.set(conn, rv)
+	}
+
+	if err != nil {
+		conn.Do("DISCARD")
+		return err
+	}
+
+	_, err = conn.Do("EXEC")
+	return err
+}
+
+func (s *ConcreteStore) set(conn redis.Conn, src reflect.Value) error {
+	if src.Type() != s.modelType && src.Type().Elem() != s.modelType {
+		return fmt.Errorf("%s is not a %v", src.Interface(), s.modelType)
+	}
+
+	m := src.Interface().(types.Model)
+
+	if err := s.validate(m); err != nil {
+		return err
+	}
+
+	key := s.getKey(m)
+
+	err := conn.Send("HMSET", redis.Args{}.Add(key).AddFlat(m)...)
 	if err != nil {
 		return err
 	}
-	prefix := s.getKeyPrefix(src)
+	prefix := s.getKeyPrefix(m)
 	for k, f := range s.ScorerFuncMap {
-		err = conn.Send("ZADD", prefix+scoreDelimiter+k, f(src), key)
+		err = conn.Send("ZADD", prefix+scoreDelimiter+k, f(m), key)
 		if err != nil {
 			return err
 		}
 	}
-	_, err = conn.Do("EXEC")
-	return err
+
+	return nil
 }
 
 // Get implements the types.Store interface.
