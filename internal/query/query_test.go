@@ -64,6 +64,11 @@ func TestQuery_Build(t *testing.T) {
 			args: []interface{}{key, "-inf", "(10"},
 		},
 		{
+			q:    New(key).Eq(10),
+			cmd:  "ZRANGEBYSCORE",
+			args: []interface{}{key, 10, 10},
+		},
+		{
 			q:    New(key).GtEq(6).LtEq(10),
 			cmd:  "ZRANGEBYSCORE",
 			args: []interface{}{key, 6, 10},
