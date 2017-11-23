@@ -4,8 +4,8 @@ import (
 	"github.com/izumin5210/ro/types"
 )
 
-// WithScorer returns a StoreOption that sets scorer functions for storing into zset.
-func WithScorer(funcs []types.ScorerFunc) types.StoreOption {
+// WithScorers returns a StoreOption that sets scorer functions for storing into zset.
+func WithScorers(funcs []types.ScorerFunc) types.StoreOption {
 	return func(c *types.StoreConfig) *types.StoreConfig {
 		c.ScorerFuncs = funcs
 		return c
