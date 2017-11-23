@@ -24,10 +24,6 @@ type TestPost struct {
 	UpdatedAt int64  `redis:"updated_at"`
 }
 
-func (p *TestPost) GetKeyPrefix() string {
-	return ""
-}
-
 func (p *TestPost) GetKeySuffix() string {
 	return fmt.Sprint(p.ID)
 }

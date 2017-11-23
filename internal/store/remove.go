@@ -9,7 +9,6 @@ import (
 // Remove implements the types.Store interface.
 func (s *ConcreteStore) Remove(src interface{}) error {
 	var err error
-	var prefix string
 
 	keys := []string{}
 
@@ -20,8 +19,6 @@ func (s *ConcreteStore) Remove(src interface{}) error {
 			if err != nil {
 				return err
 			}
-			prefix = s.getKeyPrefix(m)
-
 			keys = append(keys, s.getKey(m))
 		}
 	} else {
@@ -29,8 +26,6 @@ func (s *ConcreteStore) Remove(src interface{}) error {
 		if err != nil {
 			return err
 		}
-		prefix = s.getKeyPrefix(m)
-
 		keys = append(keys, s.getKey(m))
 	}
 
@@ -48,7 +43,7 @@ func (s *ConcreteStore) Remove(src interface{}) error {
 	}
 
 	for k := range s.ScorerFuncMap {
-		err = conn.Send("ZREM", redis.Args{}.Add(prefix+scoreDelimiter+k).AddFlat(keys)...)
+		err = conn.Send("ZREM", redis.Args{}.Add(s.KeyPrefix+scoreDelimiter+k).AddFlat(keys)...)
 		if err != nil {
 			return err
 		}
