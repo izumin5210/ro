@@ -24,11 +24,17 @@ type ConcreteStore struct {
 
 // New creates a ConcreteStore instance
 func New(getConnFunc types.GetConnFunc, model types.Model, cnf *types.StoreConfig) (types.Store, error) {
+	modelType := reflect.ValueOf(model).Elem().Type()
+
+	if len(cnf.KeyPrefix) == 0 {
+		cnf.KeyPrefix = modelType.Name()
+	}
+
 	return &ConcreteStore{
 		StoreConfig: cnf,
 		getConn:     getConnFunc,
 		model:       model,
-		modelType:   reflect.ValueOf(model).Elem().Type(),
+		modelType:   modelType,
 	}, nil
 }
 
@@ -77,9 +83,8 @@ func (s *ConcreteStore) set(conn redis.Conn, src reflect.Value) error {
 	if err != nil {
 		return err
 	}
-	prefix := s.getKeyPrefix(m)
 	for k, f := range s.ScorerFuncMap {
-		err = conn.Send("ZADD", prefix+scoreDelimiter+k, f(m), key)
+		err = conn.Send("ZADD", s.KeyPrefix+scoreDelimiter+k, f(m), key)
 		if err != nil {
 			return err
 		}
@@ -104,16 +109,8 @@ func (s *ConcreteStore) Get(dest types.Model) error {
 	return nil
 }
 
-func (s *ConcreteStore) getKeyPrefix(m types.Model) string {
-	prefix := m.GetKeyPrefix()
-	if len(prefix) == 0 {
-		prefix = s.modelType.Name()
-	}
-	return prefix
-}
-
 func (s *ConcreteStore) getKey(m types.Model) string {
-	return s.getKeyPrefix(m) + keyDelimiter + m.GetKeySuffix()
+	return s.KeyPrefix + keyDelimiter + m.GetKeySuffix()
 }
 
 func (s *ConcreteStore) toModel(rv reflect.Value) (types.Model, error) {

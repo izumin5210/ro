@@ -66,7 +66,7 @@ func (s *ConcreteStore) Count(query types.Query) (int, error) {
 
 // Query implements the types.Store interface.
 func (s *ConcreteStore) Query(key string) types.Query {
-	k := s.getKeyPrefix(s.model) + scoreDelimiter + key
+	k := s.KeyPrefix + scoreDelimiter + key
 	return query.New(k)
 }
 
