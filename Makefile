@@ -21,7 +21,7 @@ test: lint
 	@go test $(GO_TEST_FLAGS) ./...
 
 .PHONY: cover
-cover:
+cover: lint
 	@echo "mode: $(COVER_MODE)" > $(COVER_FILE)
 	@for pkg in $(GO_PKGS); do \
 		tmp=/tmp/ro-coverage.out; \
