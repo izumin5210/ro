@@ -9,11 +9,6 @@ import (
 	"github.com/izumin5210/ro/types"
 )
 
-const (
-	keyDelimiter   = ":"
-	scoreDelimiter = "/"
-)
-
 // ConcreteStore is an implementation of types.Store
 type ConcreteStore struct {
 	*types.StoreConfig
@@ -56,6 +51,5 @@ func (s *ConcreteStore) Get(dest types.Model) error {
 
 // Query implements the types.Store interface.
 func (s *ConcreteStore) Query(key string) types.Query {
-	k := s.KeyPrefix + scoreDelimiter + key
-	return query.New(k)
+	return query.New(s.getScoreSetKey(key))
 }

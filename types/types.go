@@ -25,8 +25,11 @@ type Store interface {
 
 // StoreConfig contains configurations of a store
 type StoreConfig struct {
-	ScorerFuncs []ScorerFunc
-	KeyPrefix   string
+	ScorerFuncs           []ScorerFunc
+	KeyPrefix             string
+	ScoreSetKeysKeySuffix string
+	KeyDelimiter          string
+	ScoreKeyDelimiter     string
 }
 
 // StoreOption configures a store

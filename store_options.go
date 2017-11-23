@@ -20,3 +20,27 @@ func WithKeyPrefix(prefix string) types.StoreOption {
 		return c
 	}
 }
+
+// WithScoreSetKeysKeySuffix returns a StoreOption that specifies a score set suffix key prefix (default: scoreSetKeys).
+func WithScoreSetKeysKeySuffix(suffix string) types.StoreOption {
+	return func(c *types.StoreConfig) *types.StoreConfig {
+		c.ScoreSetKeysKeySuffix = suffix
+		return c
+	}
+}
+
+// WithKeyDelimiter returns a StoreOption that specifies a key delimiter (default: :).
+func WithKeyDelimiter(d string) types.StoreOption {
+	return func(c *types.StoreConfig) *types.StoreConfig {
+		c.KeyDelimiter = d
+		return c
+	}
+}
+
+// WithScoreKeyDelimiter returns a StoreOption that specifies a score key delimiter (default: /).
+func WithScoreKeyDelimiter(d string) types.StoreOption {
+	return func(c *types.StoreConfig) *types.StoreConfig {
+		c.ScoreKeyDelimiter = d
+		return c
+	}
+}

@@ -10,7 +10,11 @@ import (
 )
 
 func (s *ConcreteStore) getKey(m types.Model) string {
-	return s.KeyPrefix + keyDelimiter + m.GetKeySuffix()
+	return s.KeyPrefix + s.KeyDelimiter + m.GetKeySuffix()
+}
+
+func (s *ConcreteStore) getScoreSetKey(key string) string {
+	return s.KeyPrefix + s.ScoreKeyDelimiter + key
 }
 
 func (s *ConcreteStore) getZsetKeysKey(m types.Model) string {
@@ -18,7 +22,7 @@ func (s *ConcreteStore) getZsetKeysKey(m types.Model) string {
 }
 
 func (s *ConcreteStore) getScoreSetKeysKeyByKey(key string) string {
-	return key + keyDelimiter + "scoreSetKeys"
+	return key + s.KeyDelimiter + s.ScoreSetKeysKeySuffix
 }
 
 func (s *ConcreteStore) toModel(rv reflect.Value) (types.Model, error) {
