@@ -51,11 +51,20 @@ func (s *ConcreteStore) set(conn redis.Conn, src reflect.Value) error {
 	if err != nil {
 		return err
 	}
-	for k, f := range s.ScorerFuncMap {
-		err = conn.Send("ZADD", s.KeyPrefix+scoreDelimiter+k, f(m), key)
+	zsetKeys := make([]string, len(s.ScorerFuncs), len(s.ScorerFuncs))
+	for _, f := range s.ScorerFuncs {
+		k, score := f(m)
+		zsetKey := s.KeyPrefix + scoreDelimiter + k
+		err = conn.Send("ZADD", zsetKey, score, key)
 		if err != nil {
 			return err
 		}
+		zsetKeys = append(zsetKeys, zsetKey)
+	}
+
+	err = conn.Send("SADD", redis.Args{}.Add(s.getZsetKeysKey(m)).AddFlat(zsetKeys)...)
+	if err != nil {
+		return err
 	}
 
 	return nil

@@ -13,6 +13,14 @@ func (s *ConcreteStore) getKey(m types.Model) string {
 	return s.KeyPrefix + keyDelimiter + m.GetKeySuffix()
 }
 
+func (s *ConcreteStore) getZsetKeysKey(m types.Model) string {
+	return s.getScoreSetKeysKeyByKey(s.getKey(m))
+}
+
+func (s *ConcreteStore) getScoreSetKeysKeyByKey(key string) string {
+	return key + keyDelimiter + "scoreSetKeys"
+}
+
 func (s *ConcreteStore) toModel(rv reflect.Value) (types.Model, error) {
 	if rv.Type() != s.modelType && rv.Type().Elem() != s.modelType {
 		return nil, fmt.Errorf("%s is not a %v", rv.Interface(), s.modelType)
