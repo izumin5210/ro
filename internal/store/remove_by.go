@@ -6,7 +6,7 @@ import (
 
 // RemoveBy implements the types.Store interface.
 func (s *ConcreteStore) RemoveBy(q types.Query) error {
-	keys, err := s.keys(q)
+	keys, err := s.selectKeys(q)
 	if err != nil {
 		return err
 	}
