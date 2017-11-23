@@ -14,16 +14,17 @@ dep: Gopkg.toml Gopkg.lock
 lint:
 	@gofmt -e -d -s $(GO_SRCS) | awk '{ e = 1; print $0 } END { if (e) exit(1) }'
 	@echo $(GO_SRCS) | xargs -n1 golint -set_exit_status
-	@go vet ./...
+	@go vet $(GO_PKGS)
 
 .PHONY: test
 test: lint
-	@go test $(GO_TEST_FLAGS) ./...
+	@go test $(GO_TEST_FLAGS) $(GO_PKGS)
 
 .PHONY: cover
-cover:
+cover: lint
 	@echo "mode: $(COVER_MODE)" > $(COVER_FILE)
-	@for pkg in $(GO_PKGS); do \
+	@set -e; \
+	for pkg in $(GO_PKGS); do \
 		tmp=/tmp/ro-coverage.out; \
 		go test $(GO_TEST_FLAGS) -coverprofile=$$tmp -covermode=$(COVER_MODE) $$pkg; \
 		if [ -f $$tmp ]; then \
