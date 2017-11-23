@@ -66,19 +66,14 @@ func (s *ConcreteStore) Set(src interface{}) error {
 }
 
 func (s *ConcreteStore) set(conn redis.Conn, src reflect.Value) error {
-	if src.Type() != s.modelType && src.Type().Elem() != s.modelType {
-		return fmt.Errorf("%s is not a %v", src.Interface(), s.modelType)
-	}
-
-	m := src.Interface().(types.Model)
-
-	if err := s.validate(m); err != nil {
-		return err
+	m, err := s.toModel(src)
+	if err != nil {
+		return nil
 	}
 
 	key := s.getKey(m)
 
-	err := conn.Send("HMSET", redis.Args{}.Add(key).AddFlat(m)...)
+	err = conn.Send("HMSET", redis.Args{}.Add(key).AddFlat(m)...)
 	if err != nil {
 		return err
 	}
@@ -121,9 +116,19 @@ func (s *ConcreteStore) getKey(m types.Model) string {
 	return s.getKeyPrefix(m) + keyDelimiter + m.GetKeySuffix()
 }
 
-func (s *ConcreteStore) validate(m types.Model) error {
-	if len(m.GetKeySuffix()) == 0 {
-		return fmt.Errorf("%v.GetKeySuffix() should be present", m)
+func (s *ConcreteStore) toModel(rv reflect.Value) (types.Model, error) {
+	if rv.Type() != s.modelType && rv.Type().Elem() != s.modelType {
+		return nil, fmt.Errorf("%s is not a %v", rv.Interface(), s.modelType)
 	}
-	return nil
+
+	m, ok := rv.Interface().(types.Model)
+	if !ok {
+		return nil, fmt.Errorf("failed to cast %v to types.Model", rv.Interface())
+	}
+
+	if len(m.GetKeySuffix()) == 0 {
+		return nil, fmt.Errorf("%v.GetKeySuffix() should be present", m)
+	}
+
+	return m, nil
 }
