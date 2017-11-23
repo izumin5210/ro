@@ -30,6 +30,11 @@ func (q *Query) LtEq(v interface{}) types.Query {
 	return q
 }
 
+// Eq implements the types.Query interface.
+func (q *Query) Eq(v interface{}) types.Query {
+	return q.GtEq(v).LtEq(v)
+}
+
 // Limit implements the types.Query interface.
 func (q *Query) Limit(v int) types.Query {
 	q.limit = v

@@ -44,6 +44,7 @@ type Query interface {
 	GtEq(v interface{}) Query
 	Lt(v interface{}) Query
 	LtEq(v interface{}) Query
+	Eq(v interface{}) Query
 	Limit(v int) Query
 	Offset(v int) Query
 	Reverse() Query
