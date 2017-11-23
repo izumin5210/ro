@@ -4,10 +4,10 @@ import (
 	"github.com/izumin5210/ro/types"
 )
 
-// WithScorer returns a StoreOption that sets scorer functions for storing into zset.
-func WithScorer(m map[string]types.ScorerFunc) types.StoreOption {
+// WithScorers returns a StoreOption that sets scorer functions for storing into zset.
+func WithScorers(funcs []types.ScorerFunc) types.StoreOption {
 	return func(c *types.StoreConfig) *types.StoreConfig {
-		c.ScorerFuncMap = m
+		c.ScorerFuncs = funcs
 		return c
 	}
 }
@@ -17,6 +17,30 @@ func WithScorer(m map[string]types.ScorerFunc) types.StoreOption {
 func WithKeyPrefix(prefix string) types.StoreOption {
 	return func(c *types.StoreConfig) *types.StoreConfig {
 		c.KeyPrefix = prefix
+		return c
+	}
+}
+
+// WithScoreSetKeysKeySuffix returns a StoreOption that specifies a score set suffix key prefix (default: scoreSetKeys).
+func WithScoreSetKeysKeySuffix(suffix string) types.StoreOption {
+	return func(c *types.StoreConfig) *types.StoreConfig {
+		c.ScoreSetKeysKeySuffix = suffix
+		return c
+	}
+}
+
+// WithKeyDelimiter returns a StoreOption that specifies a key delimiter (default: :).
+func WithKeyDelimiter(d string) types.StoreOption {
+	return func(c *types.StoreConfig) *types.StoreConfig {
+		c.KeyDelimiter = d
+		return c
+	}
+}
+
+// WithScoreKeyDelimiter returns a StoreOption that specifies a score key delimiter (default: /).
+func WithScoreKeyDelimiter(d string) types.StoreOption {
+	return func(c *types.StoreConfig) *types.StoreConfig {
+		c.ScoreKeyDelimiter = d
 		return c
 	}
 }

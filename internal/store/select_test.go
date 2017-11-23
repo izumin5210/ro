@@ -12,12 +12,12 @@ func TestCountAndSelect(t *testing.T) {
 	defer teardown(t)
 
 	cnf := &types.StoreConfig{
-		ScorerFuncMap: map[string]types.ScorerFunc{
-			"id": func(m types.Model) interface{} {
-				return m.(*TestPost).ID
+		ScorerFuncs: []types.ScorerFunc{
+			func(m types.Model) (string, interface{}) {
+				return "id", m.(*TestPost).ID
 			},
-			"recent": func(m types.Model) interface{} {
-				return m.(*TestPost).UpdatedAt
+			func(m types.Model) (string, interface{}) {
+				return "recent", m.(*TestPost).UpdatedAt
 			},
 		},
 	}

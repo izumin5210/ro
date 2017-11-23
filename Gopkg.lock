@@ -32,6 +32,12 @@
   revision = "1bed1ecb1dc42d8f4d2ac8c23e5cac64749e82c9"
 
 [[projects]]
+  name = "github.com/creasty/defaults"
+  packages = ["."]
+  revision = "79c39719194bbe3c1a00f7909871aeac028849bf"
+  version = "v1.0.0"
+
+[[projects]]
   name = "github.com/docker/docker"
   packages = ["api/types","api/types/blkiodev","api/types/container","api/types/filters","api/types/mount","api/types/network","api/types/registry","api/types/strslice","api/types/swarm","api/types/swarm/runtime","api/types/versions","opts","pkg/archive","pkg/fileutils","pkg/homedir","pkg/idtools","pkg/ioutils","pkg/jsonmessage","pkg/longpath","pkg/mount","pkg/pools","pkg/stdcopy","pkg/system","pkg/term","pkg/term/windows"]
   revision = "0e037717e06f4f260f4e76d90675ccd1e9a6bed3"
@@ -123,6 +129,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "31311b7e976fc3281e7f3d9b09ce5cc230a81cbe5833dbc801f96803e69b79a3"
+  inputs-digest = "b0ec29967557b9548c658a0766d36b41894658084118fec305d53c9b0785967f"
   solver-name = "gps-cdcl"
   solver-version = 1

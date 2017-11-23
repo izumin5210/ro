@@ -3,15 +3,11 @@ package store
 import (
 	"reflect"
 
+	"github.com/creasty/defaults"
 	"github.com/garyburd/redigo/redis"
 
 	"github.com/izumin5210/ro/internal/query"
 	"github.com/izumin5210/ro/types"
-)
-
-const (
-	keyDelimiter   = ":"
-	scoreDelimiter = "/"
 )
 
 // ConcreteStore is an implementation of types.Store
@@ -24,6 +20,9 @@ type ConcreteStore struct {
 
 // New creates a ConcreteStore instance
 func New(getConnFunc types.GetConnFunc, model types.Model, cnf *types.StoreConfig) (types.Store, error) {
+	if err := defaults.Set(cnf); err != nil {
+		return nil, err
+	}
 	modelType := reflect.ValueOf(model).Elem().Type()
 
 	if len(cnf.KeyPrefix) == 0 {
@@ -56,6 +55,5 @@ func (s *ConcreteStore) Get(dest types.Model) error {
 
 // Query implements the types.Store interface.
 func (s *ConcreteStore) Query(key string) types.Query {
-	k := s.KeyPrefix + scoreDelimiter + key
-	return query.New(k)
+	return query.New(s.getScoreSetKey(key))
 }

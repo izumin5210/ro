@@ -33,9 +33,9 @@ func TestRemove(t *testing.T) {
 	}
 
 	cnf := &types.StoreConfig{
-		ScorerFuncMap: map[string]types.ScorerFunc{
-			"recent": func(m types.Model) interface{} {
-				return m.(*TestPost).UpdatedAt
+		ScorerFuncs: []types.ScorerFunc{
+			func(m types.Model) (string, interface{}) {
+				return "recent", m.(*TestPost).UpdatedAt
 			},
 		},
 	}
@@ -107,9 +107,9 @@ func TestRemove_WithMultipleItems(t *testing.T) {
 	}
 
 	cnf := &types.StoreConfig{
-		ScorerFuncMap: map[string]types.ScorerFunc{
-			"recent": func(m types.Model) interface{} {
-				return m.(*TestPost).UpdatedAt
+		ScorerFuncs: []types.ScorerFunc{
+			func(m types.Model) (string, interface{}) {
+				return "recent", m.(*TestPost).UpdatedAt
 			},
 		},
 	}

@@ -34,6 +34,17 @@ func (s *ConcreteStore) removeByKeys(keys []string) error {
 	conn := s.getConn()
 	defer conn.Close()
 
+	keysByZsetKey := map[string][]string{}
+	for _, k := range keys {
+		zsetKeys, err := redis.Strings(conn.Do("SMEMBERS", s.getScoreSetKeysKeyByKey(k)))
+		if err != nil {
+			return err
+		}
+		for _, zk := range zsetKeys {
+			keysByZsetKey[zk] = append(keysByZsetKey[zk], k)
+		}
+	}
+
 	err := conn.Send("MULTI")
 	if err != nil {
 		return err
@@ -44,8 +55,8 @@ func (s *ConcreteStore) removeByKeys(keys []string) error {
 		return err
 	}
 
-	for k := range s.ScorerFuncMap {
-		err = conn.Send("ZREM", redis.Args{}.Add(s.KeyPrefix+scoreDelimiter+k).AddFlat(keys)...)
+	for zk, hkeys := range keysByZsetKey {
+		err = conn.Send("ZREM", redis.Args{}.Add(zk).AddFlat(hkeys)...)
 		if err != nil {
 			return err
 		}

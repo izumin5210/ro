@@ -17,9 +17,9 @@ type Post struct {
 	UpdatedAt uint64 `redis:"updated_at"`
 }
 
-var PostScorerMap = map[string] interface{} {
-	"id": func (p *Post) interface{} { return p.ID },
-	"updated": func (p *Post) interface{} { return p.UpdatedAt },
+var PostScorerFuncs = []types.ScorerFunc{
+	func (m types.Model) (string, interface{}) { return "id", m.(*Post).ID },
+	func (m types.Model) (string, interface{}) { return "updated_at", m.(*Post).UpdatedAt },
 }
 
 var pool *redis.Pool
@@ -31,7 +31,7 @@ func main() {
 		},
 	}
 
-	store := ro.New(pool, &Post{}, ro.WithScorer(PostScorerMap))
+	store := ro.New(pool.Get, &Post{}, ro.WithScorers(PostScorerFuncs))
 
 	// Posts will be stored as Hash, and id and updated_at are stored as OrderedSet
 	store.Set([]*Post{
