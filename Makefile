@@ -23,7 +23,8 @@ test: lint
 .PHONY: cover
 cover: lint
 	@echo "mode: $(COVER_MODE)" > $(COVER_FILE)
-	@for pkg in $(GO_PKGS); do \
+	@set -e; \
+	for pkg in $(GO_PKGS); do \
 		tmp=/tmp/ro-coverage.out; \
 		go test $(GO_TEST_FLAGS) -coverprofile=$$tmp -covermode=$(COVER_MODE) $$pkg; \
 		if [ -f $$tmp ]; then \
