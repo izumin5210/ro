@@ -5,9 +5,9 @@ import (
 )
 
 // WithScorer returns a StoreOption that sets scorer functions for storing into zset.
-func WithScorer(m map[string]types.ScorerFunc) types.StoreOption {
+func WithScorer(funcs []types.ScorerFunc) types.StoreOption {
 	return func(c *types.StoreConfig) *types.StoreConfig {
-		c.ScorerFuncMap = m
+		c.ScorerFuncs = funcs
 		return c
 	}
 }
