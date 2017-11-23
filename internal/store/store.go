@@ -3,6 +3,7 @@ package store
 import (
 	"reflect"
 
+	"github.com/creasty/defaults"
 	"github.com/garyburd/redigo/redis"
 
 	"github.com/izumin5210/ro/internal/query"
@@ -19,6 +20,9 @@ type ConcreteStore struct {
 
 // New creates a ConcreteStore instance
 func New(getConnFunc types.GetConnFunc, model types.Model, cnf *types.StoreConfig) (types.Store, error) {
+	if err := defaults.Set(cnf); err != nil {
+		return nil, err
+	}
 	modelType := reflect.ValueOf(model).Elem().Type()
 
 	if len(cnf.KeyPrefix) == 0 {
