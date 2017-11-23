@@ -11,3 +11,11 @@ func WithScorer(m map[string]types.ScorerFunc) types.StoreOption {
 		return c
 	}
 }
+
+// WithKeyPrefix returns a StoreOption that specifies key prefix
+func WithKeyPrefix(prefix string) types.StoreOption {
+	return func(c *types.StoreConfig) *types.StoreConfig {
+		c.KeyPrefix = prefix
+		return c
+	}
+}
