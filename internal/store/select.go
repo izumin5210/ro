@@ -5,7 +5,7 @@ import (
 	"reflect"
 
 	"github.com/garyburd/redigo/redis"
-	"github.com/izumin5210/ro/internal/query"
+
 	"github.com/izumin5210/ro/types"
 )
 
@@ -20,7 +20,7 @@ func (s *ConcreteStore) Select(dest interface{}, query types.Query) error {
 		return fmt.Errorf("must pass a slice ptr")
 	}
 
-	keys, err := s.keys(query)
+	keys, err := s.selectKeys(query)
 	if err != nil {
 		return err
 	}
@@ -57,23 +57,9 @@ func (s *ConcreteStore) Select(dest interface{}, query types.Query) error {
 
 // Count implements the types.Store interface.
 func (s *ConcreteStore) Count(query types.Query) (int, error) {
-	keys, err := s.keys(query)
+	keys, err := s.selectKeys(query)
 	if err != nil {
 		return 0, err
 	}
 	return len(keys), nil
-}
-
-// Query implements the types.Store interface.
-func (s *ConcreteStore) Query(key string) types.Query {
-	k := s.KeyPrefix + scoreDelimiter + key
-	return query.New(k)
-}
-
-func (s *ConcreteStore) keys(query types.Query) ([]string, error) {
-	conn := s.getConn()
-	defer conn.Close()
-
-	cmd, args := query.Build()
-	return redis.Strings(conn.Do(cmd, args...))
 }
