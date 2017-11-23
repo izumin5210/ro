@@ -14,11 +14,11 @@ dep: Gopkg.toml Gopkg.lock
 lint:
 	@gofmt -e -d -s $(GO_SRCS) | awk '{ e = 1; print $0 } END { if (e) exit(1) }'
 	@echo $(GO_SRCS) | xargs -n1 golint -set_exit_status
-	@go vet ./...
+	@go vet $(GO_PKGS)
 
 .PHONY: test
 test: lint
-	@go test $(GO_TEST_FLAGS) ./...
+	@go test $(GO_TEST_FLAGS) $(GO_PKGS)
 
 .PHONY: cover
 cover: lint
