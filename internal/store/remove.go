@@ -8,8 +8,6 @@ import (
 
 // Remove implements the types.Store interface.
 func (s *ConcreteStore) Remove(src interface{}) error {
-	var err error
-
 	keys := []string{}
 
 	rv := reflect.ValueOf(src)
@@ -29,10 +27,14 @@ func (s *ConcreteStore) Remove(src interface{}) error {
 		keys = append(keys, s.getKey(m))
 	}
 
+	return s.removeByKeys(keys)
+}
+
+func (s *ConcreteStore) removeByKeys(keys []string) error {
 	conn := s.getConn()
 	defer conn.Close()
 
-	err = conn.Send("MULTI")
+	err := conn.Send("MULTI")
 	if err != nil {
 		return err
 	}

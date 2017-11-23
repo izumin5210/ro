@@ -19,7 +19,7 @@ type Store interface {
 	Select(dest interface{}, query Query) error
 	Count(query Query) (int, error)
 	Remove(src interface{}) error
-	// RemoveAll(query Query) error
+	RemoveBy(query Query) error
 	Query(key string) Query
 }
 
