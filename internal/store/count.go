@@ -2,6 +2,7 @@ package store
 
 import (
 	"github.com/garyburd/redigo/redis"
+	"github.com/pkg/errors"
 
 	"github.com/izumin5210/ro/types"
 )
@@ -13,5 +14,9 @@ func (s *ConcreteStore) Count(query types.Query) (int, error) {
 
 	cmd, args := query.BuildForCount()
 
-	return redis.Int(conn.Do(cmd, args...))
+	cnt, err := redis.Int(conn.Do(cmd, args...))
+	if err != nil {
+		return 0, errors.Wrapf(err, "faild to execute %s %v", cmd, args)
+	}
+	return cnt, nil
 }

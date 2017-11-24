@@ -4,6 +4,7 @@ import (
 	"reflect"
 
 	"github.com/garyburd/redigo/redis"
+	"github.com/pkg/errors"
 )
 
 // Remove implements the types.Store interface.
@@ -15,19 +16,23 @@ func (s *ConcreteStore) Remove(src interface{}) error {
 		for i := 0; i < rv.Len(); i++ {
 			m, err := s.toModel(rv.Index(i))
 			if err != nil {
-				return err
+				return errors.Wrapf(err, "failed to convert to model %v", rv.Index(i).Interface())
 			}
 			keys = append(keys, s.getKey(m))
 		}
 	} else {
 		m, err := s.toModel(rv)
 		if err != nil {
-			return err
+			return errors.Wrapf(err, "failed to convert to model %v", rv.Interface())
 		}
 		keys = append(keys, s.getKey(m))
 	}
 
-	return s.removeByKeys(keys)
+	err := s.removeByKeys(keys)
+	if err != nil {
+		return errors.Wrapf(err, "failed to remove by keys %v", keys)
+	}
+	return nil
 }
 
 func (s *ConcreteStore) removeByKeys(keys []string) error {
@@ -38,7 +43,7 @@ func (s *ConcreteStore) removeByKeys(keys []string) error {
 	for _, k := range keys {
 		zsetKeys, err := redis.Strings(conn.Do("SMEMBERS", s.getScoreSetKeysKeyByKey(k)))
 		if err != nil {
-			return err
+			return errors.Wrapf(err, "failed to execute SMEMBERS %s", s.getScoreSetKeysKeyByKey(k))
 		}
 		for _, zk := range zsetKeys {
 			keysByZsetKey[zk] = append(keysByZsetKey[zk], k)
@@ -47,21 +52,24 @@ func (s *ConcreteStore) removeByKeys(keys []string) error {
 
 	err := conn.Send("MULTI")
 	if err != nil {
-		return err
+		return errors.Wrap(err, "faild to send MULTI command")
 	}
 
 	err = conn.Send("DEL", redis.Args{}.AddFlat(keys)...)
 	if err != nil {
-		return err
+		return errors.Wrapf(err, "faild to send DEL %v", keys)
 	}
 
 	for zk, hkeys := range keysByZsetKey {
 		err = conn.Send("ZREM", redis.Args{}.Add(zk).AddFlat(hkeys)...)
 		if err != nil {
-			return err
+			return errors.Wrapf(err, "faild to send ZREM %s %v", zk, keys)
 		}
 	}
 
 	_, err = conn.Do("EXEC")
-	return err
+	if err != nil {
+		return errors.Wrap(err, "failed to execute EXEC")
+	}
+	return nil
 }

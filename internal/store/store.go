@@ -4,6 +4,7 @@ import (
 	"reflect"
 
 	"github.com/creasty/defaults"
+	"github.com/pkg/errors"
 
 	"github.com/izumin5210/ro/internal/query"
 	"github.com/izumin5210/ro/types"
@@ -20,7 +21,7 @@ type ConcreteStore struct {
 // New creates a ConcreteStore instance
 func New(getConnFunc types.GetConnFunc, model types.Model, cnf *types.StoreConfig) (types.Store, error) {
 	if err := defaults.Set(cnf); err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "failed to set default config")
 	}
 	modelType := reflect.ValueOf(model).Elem().Type()
 
