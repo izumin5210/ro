@@ -54,12 +54,3 @@ func (s *ConcreteStore) Select(dest interface{}, query types.Query) error {
 
 	return nil
 }
-
-// Count implements the types.Store interface.
-func (s *ConcreteStore) Count(query types.Query) (int, error) {
-	keys, err := s.selectKeys(query)
-	if err != nil {
-		return 0, err
-	}
-	return len(keys), nil
-}
