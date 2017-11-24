@@ -9,6 +9,8 @@ const (
 	zrevrange        = "ZREVRANGE"
 	zrangeByScore    = "ZRANGEBYSCORE"
 	zrevrangeByScore = "ZREVRANGEBYSCORE"
+	zcard            = "ZCARD"
+	zcount           = "ZCOUNT"
 	inf              = "+inf"
 	neginf           = "-inf"
 )
@@ -53,13 +55,7 @@ func (q *Query) args() []interface{} {
 	args := []interface{}{}
 	args = append(args, q.key)
 	if q.isWithScore() {
-		max, min := q.max, q.min
-		if max == nil {
-			max = inf
-		}
-		if min == nil {
-			min = neginf
-		}
+		min, max := q.getMinAndMax()
 		if q.reverse {
 			args = append(args, max, min)
 		} else {
@@ -80,4 +76,15 @@ func (q *Query) args() []interface{} {
 
 func (q *Query) isWithScore() bool {
 	return q.min != nil || q.max != nil
+}
+
+func (q *Query) getMinAndMax() (interface{}, interface{}) {
+	max, min := q.max, q.min
+	if max == nil {
+		max = inf
+	}
+	if min == nil {
+		min = neginf
+	}
+	return min, max
 }
