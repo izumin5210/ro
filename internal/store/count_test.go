@@ -7,7 +7,7 @@ import (
 	"github.com/izumin5210/ro/types"
 )
 
-func TestCountAndSelect(t *testing.T) {
+func TestCount(t *testing.T) {
 	defer teardown(t)
 
 	cnf := &types.StoreConfig{
