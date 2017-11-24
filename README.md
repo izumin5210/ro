@@ -12,14 +12,22 @@
 type Post struct {
 	ro.Model
 	ID        uint64 `redis:"id"`
+	UserID    int `redis:"user_id"`
 	Title     string `redis:"title"`
 	Body      string `redis:"body"`
-	UpdatedAt uint64 `redis:"updated_at"`
+	CreatedAt uint64 `redis:"created_at"`
+}
+
+func (p *Post) GetKeySuffix() string {
+	return fmt.Sprint(p.ID)
 }
 
 var PostScorerFuncs = []types.ScorerFunc{
-	func (m types.Model) (string, interface{}) { return "id", m.(*Post).ID },
-	func (m types.Model) (string, interface{}) { return "updated_at", m.(*Post).UpdatedAt },
+	func (m types.Model) (string, interface{}) { return "created_at", m.(*Post).CreatedAt },
+	func (m types.Model) (string, interface{}) {
+		p := m.(*Post)
+		return fmt.Sprintf("user:%d", p.UserID), p.CreatedAt
+	},
 }
 
 var pool *redis.Pool
@@ -32,23 +40,30 @@ func main() {
 	}
 
 	store := ro.New(pool.Get, &Post{}, ro.WithScorers(PostScorerFuncs))
+	now := time.Now()
 
-	// Posts will be stored as Hash, and id and updated_at are stored as OrderedSet
+	// Posts will be stored as Hash, and user:{{userID}} and created_at are stored as OrderedSet
 	store.Set([]*Post{
 		{
-			ID: 1,
-			Title: "post 1",
-			Body: "This is a post 1",
+			ID:        1,
+			UserID:    1,
+			Title:     "post 1",
+			Body:      "This is a post 1",
+			CreatedAt: now.UnixNano(),
 		},
 		{
-			ID: 2,
-			Title: "post 2",
-			Body: "This is a post 2",
+			ID:        2,
+			UserID:    2,
+			Title:     "post 2",
+			Body:      "This is a post 2",
+			CreatedAt: now.Add(-24 * 60 * 60 * time.Second).UnixNano(),
 		},
 		{
-			ID: 3,
-			Title: "post 3",
-			Body: "This is a post 3",
+			ID:        3,
+			UserID:    1,
+			Title:     "post 3",
+			Body:      "This is a post 3",
+			CreatedAt: now.Add(24 * 60 * 60 * time.Second).UnixNano(),
 		},
 	})
 
@@ -59,17 +74,17 @@ func main() {
 	// Post{ID: 1, Title: "post 1", Body: "This is a post 1"}
 
 	posts := []*Post{}
-	_  := store.Select(&posts, store.Query("id").Gt(2).Lt(10))
+	_ := store.Select(&posts, store.Query("created_at").GtEq(now.UnixNano()).Reverse())
 	fmt.Println("%v", posts[0])
 	// Output:
-	// Post{ID: 3, Title: "post 3", Body: "This is a post 3"}
+	// Post{ID: 3, UserID: 1, Title: "post 3", Body: "This is a post 3"}
 	fmt.Println("%v", posts[1])
 	// Output:
-	// Post{ID: 2, Title: "post 2", Body: "This is a post 2"}
+	// Post{ID: 1, UserID: 1, Title: "post 1", Body: "This is a post 1"}
 
-	cnt, _ := store.Count(store.Query("id").Gt(2))
+	cnt, _ := store.Count(store.Query("user:1").Gt(now.UnixNano()).Reverse())
 	fmt.Println(cnt)
 	// Output:
-	// 2
+	// 1
 }
 ```
