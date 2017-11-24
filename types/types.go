@@ -15,7 +15,7 @@ type Model interface {
 // Store is an interface for providing CRUD operations for objects
 type Store interface {
 	Set(src interface{}) error
-	Get(dest Model) error
+	Get(dests ...Model) error
 	Select(dest interface{}, query Query) error
 	Count(query Query) (int, error)
 	Remove(src interface{}) error
