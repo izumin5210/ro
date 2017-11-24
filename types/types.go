@@ -49,4 +49,5 @@ type Query interface {
 	Offset(v int) Query
 	Reverse() Query
 	Build() (string, []interface{})
+	BuildForCount() (string, []interface{})
 }
