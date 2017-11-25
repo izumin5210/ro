@@ -1,10 +1,10 @@
 package store
 
 import (
-	"fmt"
 	"reflect"
 
 	"github.com/garyburd/redigo/redis"
+	"github.com/pkg/errors"
 
 	"github.com/izumin5210/ro/types"
 )
@@ -13,16 +13,16 @@ import (
 func (s *ConcreteStore) Select(dest interface{}, query types.Query) error {
 	dt := reflect.ValueOf(dest)
 	if dt.Kind() != reflect.Ptr || dt.IsNil() {
-		return fmt.Errorf("must pass a slice ptr")
+		return errors.New("must pass a slice ptr")
 	}
 	dt = dt.Elem()
 	if dt.Kind() != reflect.Slice {
-		return fmt.Errorf("must pass a slice ptr")
+		return errors.New("must pass a slice ptr")
 	}
 
 	keys, err := s.selectKeys(query)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "failed to select query")
 	}
 
 	conn := s.getConn()
@@ -31,7 +31,7 @@ func (s *ConcreteStore) Select(dest interface{}, query types.Query) error {
 	for _, key := range keys {
 		err := conn.Send("HGETALL", key)
 		if err != nil {
-			return err
+			return errors.Wrapf(err, "failed to send HGETALL %s", key)
 		}
 	}
 
@@ -39,15 +39,15 @@ func (s *ConcreteStore) Select(dest interface{}, query types.Query) error {
 
 	vt := dt.Type().Elem().Elem()
 
-	for range keys {
+	for _, key := range keys {
 		v, err := redis.Values(conn.Receive())
 		if err != nil {
-			return err
+			return errors.Wrap(err, "faild to receive or cast redis command result")
 		}
 		vv := reflect.New(vt)
 		err = redis.ScanStruct(v, vv.Interface())
 		if err != nil {
-			return err
+			return errors.Wrapf(err, "faild to scan struct %s %x", key, v)
 		}
 		dt.Set(reflect.Append(dt, vv))
 	}
