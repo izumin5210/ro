@@ -5,6 +5,8 @@ import (
 	"time"
 
 	"github.com/garyburd/redigo/redis"
+
+	"github.com/izumin5210/ro/internal/config"
 	"github.com/izumin5210/ro/types"
 )
 
@@ -32,11 +34,10 @@ func TestRemove(t *testing.T) {
 		},
 	}
 
-	cnf := &types.StoreConfig{
-		ScorerFuncs: []types.ScorerFunc{
-			func(m types.Model) (string, interface{}) {
-				return "recent", m.(*TestPost).UpdatedAt
-			},
+	cnf, _ := config.New()
+	cnf.ScorerFuncs = []types.ScorerFunc{
+		func(m types.Model) (string, interface{}) {
+			return "recent", m.(*TestPost).UpdatedAt
 		},
 	}
 
@@ -106,11 +107,10 @@ func TestRemove_WithMultipleItems(t *testing.T) {
 		},
 	}
 
-	cnf := &types.StoreConfig{
-		ScorerFuncs: []types.ScorerFunc{
-			func(m types.Model) (string, interface{}) {
-				return "recent", m.(*TestPost).UpdatedAt
-			},
+	cnf, _ := config.New()
+	cnf.ScorerFuncs = []types.ScorerFunc{
+		func(m types.Model) (string, interface{}) {
+			return "recent", m.(*TestPost).UpdatedAt
 		},
 	}
 
