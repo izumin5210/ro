@@ -44,3 +44,11 @@ func WithScoreKeyDelimiter(d string) types.StoreOption {
 		return c
 	}
 }
+
+// WithHashStore returns a StoreOption that enables or disables to store models into redis hash (default: true).
+func WithHashStore(enabled bool) types.StoreOption {
+	return func(c *types.StoreConfig) *types.StoreConfig {
+		c.HashStoreEnabled = enabled
+		return c
+	}
+}
