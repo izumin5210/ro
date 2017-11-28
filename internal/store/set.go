@@ -51,10 +51,13 @@ func (s *ConcreteStore) set(conn redis.Conn, src reflect.Value) error {
 
 	key := s.getKey(m)
 
-	err = conn.Send("HMSET", redis.Args{}.Add(key).AddFlat(m)...)
-	if err != nil {
-		return errors.Wrapf(err, "failed to send HMEST %s %v", key, m)
+	if s.HashStoreEnabled {
+		err = conn.Send("HMSET", redis.Args{}.Add(key).AddFlat(m)...)
+		if err != nil {
+			return errors.Wrapf(err, "failed to send HMEST %s %v", key, m)
+		}
 	}
+
 	zsetKeys := make([]string, len(s.ScorerFuncs), len(s.ScorerFuncs))
 	for _, f := range s.ScorerFuncs {
 		ks, score := f(m)

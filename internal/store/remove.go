@@ -55,9 +55,11 @@ func (s *ConcreteStore) removeByKeys(keys []string) error {
 		return errors.Wrap(err, "faild to send MULTI command")
 	}
 
-	err = conn.Send("DEL", redis.Args{}.AddFlat(keys)...)
-	if err != nil {
-		return errors.Wrapf(err, "faild to send DEL %v", keys)
+	if len(keys) > 0 {
+		err = conn.Send("DEL", redis.Args{}.AddFlat(keys)...)
+		if err != nil {
+			return errors.Wrapf(err, "faild to send DEL %v", keys)
+		}
 	}
 
 	for zk, hkeys := range keysByZsetKey {

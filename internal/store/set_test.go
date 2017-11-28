@@ -173,3 +173,50 @@ func TestSet_WithMultipleItems(t *testing.T) {
 		t.Errorf("Stored key was %q, want %q", got, want)
 	}
 }
+
+func TestSet_WhenDisableToStoreToHash(t *testing.T) {
+	defer teardown(t)
+	now := time.Now().UTC()
+	post := &TestPost{
+		ID:        1,
+		Title:     "post 1",
+		Body:      "This is a post 1.",
+		UpdatedAt: now.UnixNano(),
+	}
+
+	cnf, _ := config.New()
+	cnf.ScorerFuncs = []types.ScorerFunc{
+		func(m types.Model) (string, interface{}) {
+			return "recent", m.(*TestPost).UpdatedAt
+		},
+	}
+	cnf.HashStoreEnabled = false
+	store, err := New(redisPool.Get, &TestPost{}, cnf)
+	if err != nil {
+		t.Errorf("Unexpected error: %v", err)
+	}
+	err = store.Set(post)
+
+	if err != nil {
+		t.Errorf("Unexpected error: %v", err)
+	}
+
+	conn := redisPool.Get()
+	defer conn.Close()
+
+	keys, err := redis.Strings(conn.Do("KEYS", "*"))
+	if err != nil {
+		t.Errorf("Unexpected error: %v", err)
+	}
+	if got, want := len(keys), 1; err != nil {
+		t.Errorf("Stored keys was %d, want %d", got, want)
+	}
+
+	v, err := redis.Values(conn.Do("HGETALL", "TestPost:1"))
+	if err != nil {
+		t.Errorf("Unexpected error: %v", err)
+	}
+	if len(v) > 0 {
+		t.Errorf("Unexpected response: %v", v)
+	}
+}
