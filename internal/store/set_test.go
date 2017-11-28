@@ -7,6 +7,8 @@ import (
 	"time"
 
 	"github.com/garyburd/redigo/redis"
+
+	"github.com/izumin5210/ro/internal/config"
 	"github.com/izumin5210/ro/types"
 )
 
@@ -20,13 +22,13 @@ func TestSet(t *testing.T) {
 		UpdatedAt: now.UnixNano(),
 	}
 
-	cnf := &types.StoreConfig{
-		ScorerFuncs: []types.ScorerFunc{
-			func(m types.Model) (string, interface{}) {
-				return "recent", m.(*TestPost).UpdatedAt
-			},
+	cnf, _ := config.New()
+	cnf.ScorerFuncs = []types.ScorerFunc{
+		func(m types.Model) (string, interface{}) {
+			return "recent", m.(*TestPost).UpdatedAt
 		},
 	}
+
 	store, err := New(redisPool.Get, &TestPost{}, cnf)
 	if err != nil {
 		t.Errorf("Unexpected error: %v", err)
@@ -109,11 +111,10 @@ func TestSet_WithMultipleItems(t *testing.T) {
 		},
 	}
 
-	cnf := &types.StoreConfig{
-		ScorerFuncs: []types.ScorerFunc{
-			func(m types.Model) (string, interface{}) {
-				return "recent", m.(*TestPost).UpdatedAt
-			},
+	cnf, _ := config.New()
+	cnf.ScorerFuncs = []types.ScorerFunc{
+		func(m types.Model) (string, interface{}) {
+			return "recent", m.(*TestPost).UpdatedAt
 		},
 	}
 

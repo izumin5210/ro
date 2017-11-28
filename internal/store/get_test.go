@@ -5,13 +5,16 @@ import (
 	"testing"
 
 	"github.com/garyburd/redigo/redis"
-
-	"github.com/izumin5210/ro/types"
+	"github.com/izumin5210/ro/internal/config"
 )
 
 func TestGet(t *testing.T) {
 	defer teardown(t)
-	store, err := New(redisPool.Get, &TestPost{}, &types.StoreConfig{})
+	cnf, err := config.New()
+	if err != nil {
+		t.Errorf("Unexpected error: %v", err)
+	}
+	store, err := New(redisPool.Get, &TestPost{}, cnf)
 	if err != nil {
 		t.Errorf("Unexpected error: %v", err)
 	}
