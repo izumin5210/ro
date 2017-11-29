@@ -12,14 +12,6 @@ func TestCount(t *testing.T) {
 	defer teardown(t)
 
 	cnf, _ := config.New()
-	cnf.ScorerFuncs = []types.ScorerFunc{
-		func(m types.Model) (string, interface{}) {
-			return "id", m.(*TestPost).ID
-		},
-		func(m types.Model) (string, interface{}) {
-			return "recent", m.(*TestPost).UpdatedAt
-		},
-	}
 	store, err := New(redisPool.Get, &TestPost{}, cnf)
 	if err != nil {
 		t.Fatalf("Unexpected error: %v", err)
