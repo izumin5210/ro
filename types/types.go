@@ -10,6 +10,7 @@ type GetConnFunc func() redis.Conn
 // Model is an interface for redis objects
 type Model interface {
 	GetKeySuffix() string
+	GetScoreMap() map[string]interface{}
 }
 
 // Store is an interface for providing CRUD operations for objects
