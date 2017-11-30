@@ -22,12 +22,11 @@ func (p *Post) GetKeySuffix() string {
 	return fmt.Sprint(p.ID)
 }
 
-var PostScorerFuncs = []types.ScorerFunc{
-	func (m types.Model) (string, interface{}) { return "created_at", m.(*Post).CreatedAt },
-	func (m types.Model) (string, interface{}) {
-		p := m.(*Post)
-		return fmt.Sprintf("user:%d", p.UserID), p.CreatedAt
-	},
+func (p *Post) GetScoreMap() map[string]interface{} {
+	return map[string]interface{}{
+		"created_at":                     p.CreatedAt,
+		fmt.Sprintf("user:%d", p.UserID): p.CreatedAt,
+	}
 }
 
 var pool *redis.Pool
@@ -39,7 +38,7 @@ func main() {
 		},
 	}
 
-	store := ro.New(pool.Get, &Post{}, ro.WithScorers(PostScorerFuncs))
+	store := ro.New(pool.Get, &Post{})
 	now := time.Now()
 
 	// Posts will be stored as Hash, and user:{{userID}} and created_at are stored as OrderedSet

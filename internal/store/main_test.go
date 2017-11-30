@@ -21,6 +21,13 @@ func (p *TestPost) GetKeySuffix() string {
 	return fmt.Sprint(p.ID)
 }
 
+func (p *TestPost) GetScoreMap() map[string]interface{} {
+	return map[string]interface{}{
+		"id":     p.ID,
+		"recent": p.UpdatedAt,
+	}
+}
+
 var redisPool *redis.Pool
 
 func TestMain(m *testing.M) {

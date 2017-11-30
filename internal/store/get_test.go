@@ -10,10 +10,7 @@ import (
 
 func TestGet(t *testing.T) {
 	defer teardown(t)
-	cnf, err := config.New()
-	if err != nil {
-		t.Errorf("Unexpected error: %v", err)
-	}
+	cnf, _ := config.New()
 	store, err := New(redisPool.Get, &TestPost{}, cnf)
 	if err != nil {
 		t.Errorf("Unexpected error: %v", err)
