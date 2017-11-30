@@ -55,9 +55,9 @@ func (s *ConcreteStore) set(conn redis.Conn, src reflect.Value) error {
 	if err != nil {
 		return errors.Wrapf(err, "failed to send HMEST %s %v", key, m)
 	}
-	zsetKeys := make([]string, len(s.ScorerFuncs), len(s.ScorerFuncs))
-	for _, f := range s.ScorerFuncs {
-		ks, score := f(m)
+	scoreMap := m.GetScoreMap()
+	zsetKeys := make([]string, 0, len(scoreMap))
+	for ks, score := range scoreMap {
 		scoreSetKey := s.getScoreSetKey(ks)
 		err = conn.Send("ZADD", scoreSetKey, score, key)
 		if err != nil {
