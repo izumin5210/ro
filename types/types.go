@@ -10,6 +10,7 @@ type GetConnFunc func() redis.Conn
 // Model is an interface for redis objects
 type Model interface {
 	GetKeySuffix() string
+	GetScoreMap() map[string]interface{}
 }
 
 // Store is an interface for providing CRUD operations for objects
@@ -25,7 +26,6 @@ type Store interface {
 
 // StoreConfig contains configurations of a store
 type StoreConfig struct {
-	ScorerFuncs           []ScorerFunc `default:"[]"`
 	KeyPrefix             string
 	ScoreSetKeysKeySuffix string `default:"scoreSetKeys"`
 	KeyDelimiter          string `default:":"`
