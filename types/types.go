@@ -30,6 +30,7 @@ type StoreConfig struct {
 	ScoreSetKeysKeySuffix string `default:"scoreSetKeys"`
 	KeyDelimiter          string `default:":"`
 	ScoreKeyDelimiter     string `default:"/"`
+	HashStoreEnabled      bool   `default:"true"`
 }
 
 // StoreOption configures a store
