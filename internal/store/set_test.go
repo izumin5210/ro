@@ -172,11 +172,6 @@ func TestSet_WhenDisableToStoreToHash(t *testing.T) {
 	}
 
 	cnf, _ := config.New()
-	cnf.ScorerFuncs = []types.ScorerFunc{
-		func(m types.Model) (string, interface{}) {
-			return "recent", m.(*TestPost).UpdatedAt
-		},
-	}
 	cnf.HashStoreEnabled = false
 	store, err := New(redisPool.Get, &TestPost{}, cnf)
 	if err != nil {
