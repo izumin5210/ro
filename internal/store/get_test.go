@@ -5,18 +5,20 @@ import (
 	"testing"
 
 	"github.com/garyburd/redigo/redis"
+
 	"github.com/izumin5210/ro/internal/config"
+	"github.com/izumin5210/ro/internal/testing"
 )
 
 func TestGet(t *testing.T) {
 	defer teardown(t)
 	cnf, _ := config.New()
-	store, err := New(redisPool.Get, &TestPost{}, cnf)
+	store, err := New(pool.Get, &rotesting.Post{}, cnf)
 	if err != nil {
 		t.Errorf("Unexpected error: %v", err)
 	}
 
-	posts := []*TestPost{
+	posts := []*rotesting.Post{
 		{
 			ID:    1,
 			Title: "post 1",
@@ -29,13 +31,13 @@ func TestGet(t *testing.T) {
 		},
 	}
 
-	conn := redisPool.Get()
+	conn := pool.Get()
 	defer conn.Close()
-	conn.Do("HMSET", redis.Args{}.Add("TestPost:1").AddFlat(posts[0])...)
-	conn.Do("HMSET", redis.Args{}.Add("TestPost:2").AddFlat(posts[1])...)
+	conn.Do("HMSET", redis.Args{}.Add("Post:1").AddFlat(posts[0])...)
+	conn.Do("HMSET", redis.Args{}.Add("Post:2").AddFlat(posts[1])...)
 
 	t.Run("single get", func(t *testing.T) {
-		gotPost := &TestPost{ID: 2}
+		gotPost := &rotesting.Post{ID: 2}
 		err = store.Get(gotPost)
 
 		if err != nil {
@@ -47,7 +49,7 @@ func TestGet(t *testing.T) {
 	})
 
 	t.Run("multi get", func(t *testing.T) {
-		gotPosts := []*TestPost{{ID: 2}, {ID: 1}}
+		gotPosts := []*rotesting.Post{{ID: 2}, {ID: 1}}
 		err = store.Get(gotPosts[0], gotPosts[1])
 
 		if err != nil {

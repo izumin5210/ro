@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/izumin5210/ro/internal/config"
+	"github.com/izumin5210/ro/internal/testing"
 	"github.com/izumin5210/ro/types"
 )
 
@@ -13,13 +14,13 @@ func TestSelect(t *testing.T) {
 	defer teardown(t)
 
 	cnf, _ := config.New()
-	store, err := New(redisPool.Get, &TestPost{}, cnf)
+	store, err := New(pool.Get, &rotesting.Post{}, cnf)
 	if err != nil {
 		t.Fatalf("Unexpected error: %v", err)
 	}
 
 	now := time.Now().UTC()
-	posts := []*TestPost{
+	posts := []*rotesting.Post{
 		{
 			ID:        1,
 			Title:     "post 1",
@@ -60,7 +61,7 @@ func TestSelect(t *testing.T) {
 		}
 	}
 
-	conn := redisPool.Get()
+	conn := pool.Get()
 	defer conn.Close()
 
 	cases := []struct {
@@ -170,7 +171,7 @@ func TestSelect(t *testing.T) {
 
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
-			gotPosts := []*TestPost{}
+			gotPosts := []*rotesting.Post{}
 			err = store.Select(&gotPosts, c.q)
 
 			if err != nil {

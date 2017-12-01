@@ -7,12 +7,13 @@ import (
 	"github.com/garyburd/redigo/redis"
 
 	"github.com/izumin5210/ro/internal/config"
+	"github.com/izumin5210/ro/internal/testing"
 )
 
 func TestRemoveBy(t *testing.T) {
 	defer teardown(t)
 	now := time.Now().UTC()
-	posts := []*TestPost{
+	posts := []*rotesting.Post{
 		{
 			ID:        1,
 			Title:     "post 1",
@@ -46,7 +47,7 @@ func TestRemoveBy(t *testing.T) {
 	}
 
 	cnf, _ := config.New()
-	store, err := New(redisPool.Get, &TestPost{}, cnf)
+	store, err := New(pool.Get, &rotesting.Post{}, cnf)
 	if err != nil {
 		t.Errorf("Unexpected error: %v", err)
 	}
@@ -63,7 +64,7 @@ func TestRemoveBy(t *testing.T) {
 		t.Errorf("Unexpected error: %v", err)
 	}
 
-	conn := redisPool.Get()
+	conn := pool.Get()
 	defer conn.Close()
 
 	keys, err := redis.Strings(conn.Do("KEYS", "*"))
@@ -74,7 +75,7 @@ func TestRemoveBy(t *testing.T) {
 		t.Errorf("Stored keys was %d, want %d", got, want)
 	}
 
-	v, err := redis.Values(conn.Do("HGETALL", "TestPost:1"))
+	v, err := redis.Values(conn.Do("HGETALL", "rotesting.Post:1"))
 	if err != nil {
 		t.Errorf("Unexpected error: %v", err)
 	}
@@ -82,7 +83,7 @@ func TestRemoveBy(t *testing.T) {
 		t.Errorf("Unexpected response: %v", v)
 	}
 
-	v, err = redis.Values(conn.Do("HGETALL", "TestPost:2"))
+	v, err = redis.Values(conn.Do("HGETALL", "rotesting.Post:2"))
 	if err != nil {
 		t.Errorf("Unexpected error: %v", err)
 	}
@@ -90,7 +91,7 @@ func TestRemoveBy(t *testing.T) {
 		t.Errorf("Unexpected response: %v", v)
 	}
 
-	v, err = redis.Values(conn.Do("HGETALL", "TestPost:5"))
+	v, err = redis.Values(conn.Do("HGETALL", "rotesting.Post:5"))
 	if err != nil {
 		t.Errorf("Unexpected error: %v", err)
 	}
