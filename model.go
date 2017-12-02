@@ -13,5 +13,5 @@ func (b *Model) GetKeySuffix() string {
 // GetScoreMap implements the types.Model interface.
 // If you does not override this function, ro.Store does not store any scores.
 func (b *Model) GetScoreMap() map[string]interface{} {
-	return nil
+	return map[string]interface{}{}
 }
