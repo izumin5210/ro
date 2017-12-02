@@ -5,20 +5,21 @@ import (
 	"reflect"
 
 	"github.com/garyburd/redigo/redis"
+	"github.com/pkg/errors"
 
 	"github.com/izumin5210/ro/types"
 )
 
-func (s *ConcreteStore) getKey(m types.Model) string {
-	return s.KeyPrefix + s.KeyDelimiter + m.GetKeySuffix()
+func (s *ConcreteStore) getKey(m types.Model) (string, error) {
+	suffix := m.GetKeySuffix()
+	if len(suffix) == 0 {
+		return "", errors.New("GetKeySuffix() should be present")
+	}
+	return s.KeyPrefix + s.KeyDelimiter + suffix, nil
 }
 
 func (s *ConcreteStore) getScoreSetKey(key string) string {
 	return s.KeyPrefix + s.ScoreKeyDelimiter + key
-}
-
-func (s *ConcreteStore) getZsetKeysKey(m types.Model) string {
-	return s.getScoreSetKeysKeyByKey(s.getKey(m))
 }
 
 func (s *ConcreteStore) getScoreSetKeysKeyByKey(key string) string {

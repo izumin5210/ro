@@ -1,7 +1,9 @@
 package store
 
 import (
+	"fmt"
 	"reflect"
+	"strconv"
 
 	"github.com/garyburd/redigo/redis"
 	"github.com/pkg/errors"
@@ -49,7 +51,11 @@ func (s *ConcreteStore) set(conn redis.Conn, src reflect.Value) error {
 		return errors.Wrap(err, "failed to convert to model")
 	}
 
-	key := s.getKey(m)
+	key, err := s.getKey(m)
+
+	if err != nil {
+		return errors.Wrap(err, "failed to get key")
+	}
 
 	if s.HashStoreEnabled {
 		err = conn.Send("HMSET", redis.Args{}.Add(key).AddFlat(m)...)
@@ -59,8 +65,19 @@ func (s *ConcreteStore) set(conn redis.Conn, src reflect.Value) error {
 	}
 
 	scoreMap := m.GetScoreMap()
+	if scoreMap == nil {
+		return errors.Errorf("%s's GetScoreMap() should be present", key)
+	}
+
 	zsetKeys := make([]string, 0, len(scoreMap))
 	for ks, score := range scoreMap {
+		if len(ks) == 0 {
+			return errors.Errorf("key in %s's GetScoreMap() should be present", key)
+		}
+		_, err := strconv.ParseFloat(fmt.Sprint(score), 64)
+		if err != nil {
+			return errors.Wrapf(err, "%s's GetScoreMap()[%s] should be number", key, ks)
+		}
 		scoreSetKey := s.getScoreSetKey(ks)
 		err = conn.Send("ZADD", scoreSetKey, score, key)
 		if err != nil {
@@ -69,9 +86,10 @@ func (s *ConcreteStore) set(conn redis.Conn, src reflect.Value) error {
 		zsetKeys = append(zsetKeys, scoreSetKey)
 	}
 
-	err = conn.Send("SADD", redis.Args{}.Add(s.getZsetKeysKey(m)).AddFlat(zsetKeys)...)
+	scoreSetKeysKey := s.getScoreSetKeysKeyByKey(key)
+	err = conn.Send("SADD", redis.Args{}.Add(scoreSetKeysKey).AddFlat(zsetKeys)...)
 	if err != nil {
-		return errors.Wrapf(err, "failed to send SADD %s %v", s.getZsetKeysKey(m), zsetKeys)
+		return errors.Wrapf(err, "failed to send SADD %s %v", scoreSetKeysKey, zsetKeys)
 	}
 
 	return nil
