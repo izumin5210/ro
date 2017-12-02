@@ -343,6 +343,41 @@ func TestSet_WithNotNumberScore(t *testing.T) {
 	}
 }
 
+type DummyWithTooLargeScore struct {
+}
+
+func (d *DummyWithTooLargeScore) GetKeySuffix() string { return "test" }
+func (d *DummyWithTooLargeScore) GetScoreMap() map[string]interface{} {
+	return map[string]interface{}{"test": 1, "test1": strings.Repeat("2", 309)}
+}
+
+func TestSet_WithTooLargeNumberScore(t *testing.T) {
+	cnf, _ := config.New()
+	cnf.HashStoreEnabled = false
+	store, err := New(pool.Get, &DummyWithTooLargeScore{}, cnf)
+	if err != nil {
+		t.Errorf("Unexpected error: %v", err)
+	}
+
+	dummy := &DummyWithTooLargeScore{}
+	err = store.Set(dummy)
+
+	if err == nil {
+		t.Error("Set() with not number score should return an error")
+	}
+
+	if got, want := err.Error(), "GetScoreMap()[test1] should be number"; !strings.Contains(got, want) {
+		t.Errorf("Set() with not number score should return an error %q, want to contain %q", got, want)
+	}
+
+	conn := pool.Get()
+	defer conn.Close()
+	keys, _ := redis.Strings(conn.Do("KEYS", "*"))
+	if got, want := keys, []string{}; !reflect.DeepEqual(got, want) {
+		t.Errorf("Set() with not number score stores %v, want %v", got, want)
+	}
+}
+
 type DummyWithStringNumberScore struct {
 }
 
@@ -352,7 +387,7 @@ func (d *DummyWithStringNumberScore) GetScoreMap() map[string]interface{} {
 		"test":  1,
 		"test1": "100.1",
 		"test2": "100",
-		"test3": strings.Repeat("999", 999),
+		"test3": strings.Repeat("1", 309),
 	}
 }
 
@@ -374,7 +409,7 @@ func TestSet_WithStringNumberScore(t *testing.T) {
 	conn := pool.Get()
 	defer conn.Close()
 	keys, _ := redis.Strings(conn.Do("KEYS", "*"))
-	if got, want := len(keys), 4; got != want {
+	if got, want := len(keys), 5; got != want {
 		t.Errorf("Set() with string number score stores %d items, want %d items", got, want)
 	}
 }

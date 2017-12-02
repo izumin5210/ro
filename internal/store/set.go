@@ -75,7 +75,7 @@ func (s *ConcreteStore) set(conn redis.Conn, src reflect.Value) error {
 			return errors.Errorf("key in %s's GetScoreMap() should be present", key)
 		}
 		_, err := strconv.ParseFloat(fmt.Sprint(score), 64)
-		if err != nil && err.(*strconv.NumError).Err != strconv.ErrRange {
+		if err != nil {
 			return errors.Wrapf(err, "%s's GetScoreMap()[%s] should be number", key, ks)
 		}
 		scoreSetKey := s.getScoreSetKey(ks)
