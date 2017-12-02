@@ -3,6 +3,7 @@ package store
 import (
 	"fmt"
 	"reflect"
+	"strings"
 	"testing"
 	"time"
 
@@ -201,5 +202,179 @@ func TestSet_WhenDisableToStoreToHash(t *testing.T) {
 	}
 	if len(v) > 0 {
 		t.Errorf("Unexpected response: %v", v)
+	}
+}
+
+type DummyWithEmptyKeySuffix struct {
+}
+
+func (d *DummyWithEmptyKeySuffix) GetKeySuffix() string { return "" }
+func (d *DummyWithEmptyKeySuffix) GetScoreMap() map[string]interface{} {
+	return map[string]interface{}{}
+}
+
+func TestSet_WhenKeySuffixIsEmpty(t *testing.T) {
+	cnf, _ := config.New()
+	cnf.HashStoreEnabled = false
+	store, err := New(pool.Get, &DummyWithEmptyKeySuffix{}, cnf)
+	if err != nil {
+		t.Errorf("Unexpected error: %v", err)
+	}
+
+	dummy := &DummyWithEmptyKeySuffix{}
+	err = store.Set(dummy)
+
+	if err == nil {
+		t.Error("Set() with an empty key suffix should return an error")
+	}
+
+	if got, want := err.Error(), "GetKeySuffix() should be present"; !strings.Contains(got, want) {
+		t.Errorf("Set() with an empty key suffix should return an error %q, want to contain %q", got, want)
+	}
+
+	conn := pool.Get()
+	defer conn.Close()
+	keys, _ := redis.Strings(conn.Do("KEYS", "*"))
+	if got, want := keys, []string{}; !reflect.DeepEqual(got, want) {
+		t.Errorf("Set() with an empty key suffix stores %v, want %v", got, want)
+	}
+}
+
+type DummyWithNilScoreMap struct {
+}
+
+func (d *DummyWithNilScoreMap) GetKeySuffix() string                { return "test" }
+func (d *DummyWithNilScoreMap) GetScoreMap() map[string]interface{} { return nil }
+
+func TestSet_WithScoreMapIsNil(t *testing.T) {
+	cnf, _ := config.New()
+	cnf.HashStoreEnabled = false
+	store, err := New(pool.Get, &DummyWithNilScoreMap{}, cnf)
+	if err != nil {
+		t.Errorf("Unexpected error: %v", err)
+	}
+
+	dummy := &DummyWithNilScoreMap{}
+	err = store.Set(dummy)
+
+	if err == nil {
+		t.Error("Set() with nil score map should return an error")
+	}
+
+	if got, want := err.Error(), "GetScoreMap() should be present"; !strings.Contains(got, want) {
+		t.Errorf("Set() with nil score map should return an error %q, want to contain %q", got, want)
+	}
+
+	conn := pool.Get()
+	defer conn.Close()
+	keys, _ := redis.Strings(conn.Do("KEYS", "*"))
+	if got, want := keys, []string{}; !reflect.DeepEqual(got, want) {
+		t.Errorf("Set() with nil score map stores %v, want %v", got, want)
+	}
+}
+
+type DummyWithEmptyScoreKey struct {
+}
+
+func (d *DummyWithEmptyScoreKey) GetKeySuffix() string { return "test" }
+func (d *DummyWithEmptyScoreKey) GetScoreMap() map[string]interface{} {
+	return map[string]interface{}{"test": 1, "": 2}
+}
+
+func TestSet_WithEmptyScoreKey(t *testing.T) {
+	cnf, _ := config.New()
+	cnf.HashStoreEnabled = false
+	store, err := New(pool.Get, &DummyWithEmptyScoreKey{}, cnf)
+	if err != nil {
+		t.Errorf("Unexpected error: %v", err)
+	}
+
+	dummy := &DummyWithEmptyScoreKey{}
+	err = store.Set(dummy)
+
+	if err == nil {
+		t.Error("Set() with empty score key should return an error")
+	}
+
+	if got, want := err.Error(), "key in DummyWithEmptyScoreKey:test's GetScoreMap() should be present"; !strings.Contains(got, want) {
+		t.Errorf("Set() with empty score key should return an error %q, want to contain %q", got, want)
+	}
+
+	conn := pool.Get()
+	defer conn.Close()
+	keys, _ := redis.Strings(conn.Do("KEYS", "*"))
+	if got, want := keys, []string{}; !reflect.DeepEqual(got, want) {
+		t.Errorf("Set() with empty score key stores %v, want %v", got, want)
+	}
+}
+
+type DummyWithNotNumberScore struct {
+}
+
+func (d *DummyWithNotNumberScore) GetKeySuffix() string { return "test" }
+func (d *DummyWithNotNumberScore) GetScoreMap() map[string]interface{} {
+	return map[string]interface{}{"test": 1, "test1": "1.1.1"}
+}
+
+func TestSet_WithNotNumberScore(t *testing.T) {
+	cnf, _ := config.New()
+	cnf.HashStoreEnabled = false
+	store, err := New(pool.Get, &DummyWithNotNumberScore{}, cnf)
+	if err != nil {
+		t.Errorf("Unexpected error: %v", err)
+	}
+
+	dummy := &DummyWithNotNumberScore{}
+	err = store.Set(dummy)
+
+	if err == nil {
+		t.Error("Set() with not number score should return an error")
+	}
+
+	if got, want := err.Error(), "GetScoreMap()[test1] should be number"; !strings.Contains(got, want) {
+		t.Errorf("Set() with not number score should return an error %q, want to contain %q", got, want)
+	}
+
+	conn := pool.Get()
+	defer conn.Close()
+	keys, _ := redis.Strings(conn.Do("KEYS", "*"))
+	if got, want := keys, []string{}; !reflect.DeepEqual(got, want) {
+		t.Errorf("Set() with not number score stores %v, want %v", got, want)
+	}
+}
+
+type DummyWithStringNumberScore struct {
+}
+
+func (d *DummyWithStringNumberScore) GetKeySuffix() string { return "test" }
+func (d *DummyWithStringNumberScore) GetScoreMap() map[string]interface{} {
+	return map[string]interface{}{
+		"test":  1,
+		"test1": "100.1",
+		"test2": "100",
+		"test3": strings.Repeat("999", 999),
+	}
+}
+
+func TestSet_WithStringNumberScore(t *testing.T) {
+	cnf, _ := config.New()
+	cnf.HashStoreEnabled = false
+	store, err := New(pool.Get, &DummyWithStringNumberScore{}, cnf)
+	if err != nil {
+		t.Errorf("Unexpected error: %v", err)
+	}
+
+	dummy := &DummyWithStringNumberScore{}
+	err = store.Set(dummy)
+
+	if err != nil {
+		t.Errorf("Unexpected error: %v", err)
+	}
+
+	conn := pool.Get()
+	defer conn.Close()
+	keys, _ := redis.Strings(conn.Do("KEYS", "*"))
+	if got, want := len(keys), 4; got != want {
+		t.Errorf("Set() with string number score stores %d items, want %d items", got, want)
 	}
 }
