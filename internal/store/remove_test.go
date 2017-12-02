@@ -7,12 +7,13 @@ import (
 	"github.com/garyburd/redigo/redis"
 
 	"github.com/izumin5210/ro/internal/config"
+	"github.com/izumin5210/ro/internal/testing"
 )
 
 func TestRemove(t *testing.T) {
 	defer teardown(t)
 	now := time.Now().UTC()
-	posts := []*TestPost{
+	posts := []*rotesting.Post{
 		{
 			ID:        1,
 			Title:     "post 1",
@@ -34,7 +35,7 @@ func TestRemove(t *testing.T) {
 	}
 
 	cnf, _ := config.New()
-	store, err := New(redisPool.Get, &TestPost{}, cnf)
+	store, err := New(pool.Get, &rotesting.Post{}, cnf)
 	if err != nil {
 		t.Errorf("Unexpected error: %v", err)
 	}
@@ -48,7 +49,7 @@ func TestRemove(t *testing.T) {
 		t.Errorf("Unexpected error: %v", err)
 	}
 
-	conn := redisPool.Get()
+	conn := pool.Get()
 	defer conn.Close()
 
 	keys, err := redis.Strings(conn.Do("KEYS", "*"))
@@ -59,7 +60,7 @@ func TestRemove(t *testing.T) {
 		t.Errorf("Stored keys was %d, want %d", got, want)
 	}
 
-	v, err := redis.Values(conn.Do("HGETALL", "TestPost:1"))
+	v, err := redis.Values(conn.Do("HGETALL", "rotesting.Post:1"))
 	if err != nil {
 		t.Errorf("Unexpected error: %v", err)
 	}
@@ -79,7 +80,7 @@ func TestRemove(t *testing.T) {
 func TestRemove_WithMultipleItems(t *testing.T) {
 	defer teardown(t)
 	now := time.Now().UTC()
-	posts := []*TestPost{
+	posts := []*rotesting.Post{
 		{
 			ID:        1,
 			Title:     "post 1",
@@ -101,7 +102,7 @@ func TestRemove_WithMultipleItems(t *testing.T) {
 	}
 
 	cnf, _ := config.New()
-	store, err := New(redisPool.Get, &TestPost{}, cnf)
+	store, err := New(pool.Get, &rotesting.Post{}, cnf)
 	if err != nil {
 		t.Errorf("Unexpected error: %v", err)
 	}
@@ -110,12 +111,12 @@ func TestRemove_WithMultipleItems(t *testing.T) {
 		t.Errorf("Unexpected error: %v", err)
 	}
 
-	err = store.Remove([]*TestPost{posts[0], posts[2]})
+	err = store.Remove([]*rotesting.Post{posts[0], posts[2]})
 	if err != nil {
 		t.Errorf("Unexpected error: %v", err)
 	}
 
-	conn := redisPool.Get()
+	conn := pool.Get()
 	defer conn.Close()
 
 	keys, err := redis.Strings(conn.Do("KEYS", "*"))
@@ -126,7 +127,7 @@ func TestRemove_WithMultipleItems(t *testing.T) {
 		t.Errorf("Stored keys was %d, want %d", got, want)
 	}
 
-	v, err := redis.Values(conn.Do("HGETALL", "TestPost:1"))
+	v, err := redis.Values(conn.Do("HGETALL", "rotesting.Post:1"))
 	if err != nil {
 		t.Errorf("Unexpected error: %v", err)
 	}
@@ -134,7 +135,7 @@ func TestRemove_WithMultipleItems(t *testing.T) {
 		t.Errorf("Unexpected response: %v", v)
 	}
 
-	v, err = redis.Values(conn.Do("HGETALL", "TestPost:3"))
+	v, err = redis.Values(conn.Do("HGETALL", "rotesting.Post:3"))
 	if err != nil {
 		t.Errorf("Unexpected error: %v", err)
 	}
@@ -154,7 +155,7 @@ func TestRemove_WithMultipleItems(t *testing.T) {
 func TestRemove_WhenDisableToStoreToHash(t *testing.T) {
 	defer teardown(t)
 	now := time.Now().UTC()
-	posts := []*TestPost{
+	posts := []*rotesting.Post{
 		{
 			ID:        1,
 			Title:     "post 1",
@@ -178,7 +179,7 @@ func TestRemove_WhenDisableToStoreToHash(t *testing.T) {
 	cnf, _ := config.New()
 	cnf.HashStoreEnabled = false
 
-	store, err := New(redisPool.Get, &TestPost{}, cnf)
+	store, err := New(pool.Get, &rotesting.Post{}, cnf)
 	if err != nil {
 		t.Errorf("Unexpected error: %v", err)
 	}
@@ -192,7 +193,7 @@ func TestRemove_WhenDisableToStoreToHash(t *testing.T) {
 		t.Errorf("Unexpected error: %v", err)
 	}
 
-	conn := redisPool.Get()
+	conn := pool.Get()
 	defer conn.Close()
 
 	keys, err := redis.Strings(conn.Do("KEYS", "*"))
