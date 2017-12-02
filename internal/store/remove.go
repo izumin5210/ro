@@ -18,14 +18,22 @@ func (s *ConcreteStore) Remove(src interface{}) error {
 			if err != nil {
 				return errors.Wrapf(err, "failed to convert to model %v", rv.Index(i).Interface())
 			}
-			keys = append(keys, s.getKey(m))
+			key, err := s.getKey(m)
+			if err != nil {
+				return errors.Wrap(err, "failed to get key")
+			}
+			keys = append(keys, key)
 		}
 	} else {
 		m, err := s.toModel(rv)
 		if err != nil {
 			return errors.Wrapf(err, "failed to convert to model %v", rv.Interface())
 		}
-		keys = append(keys, s.getKey(m))
+		key, err := s.getKey(m)
+		if err != nil {
+			return errors.Wrap(err, "failed to get key")
+		}
+		keys = append(keys, key)
 	}
 
 	err := s.removeByKeys(keys)
