@@ -13,12 +13,12 @@
   revision = "d6e3b3328b783f23731bc4d058875b0371ff8109"
 
 [[projects]]
-  digest = "1:c9c336ca4936411a991d81f976dac8abf277ac7fd9d1c8ef706e94fc7948a0f7"
+  digest = "1:c7937d6337f88193ad8aade88c92d7e72b3d5fc6e5002a9515dabca5802624cd"
   name = "github.com/Microsoft/go-winio"
   packages = ["."]
   pruneopts = ""
-  revision = "78439966b38d69bf38227fbf57ac8a6fee70f69a"
-  version = "v0.4.5"
+  revision = "97e4973ce50b2ff5f09635a57e2b88a037aae829"
+  version = "v0.4.11"
 
 [[projects]]
   branch = "master"
@@ -29,61 +29,28 @@
   revision = "cd527374f1e5bff4938207604a14f2e38a9cf512"
 
 [[projects]]
-  digest = "1:1cf61f0228e64d1bfddaa42bfd1f5047ed3626925b9bea69bbcb9168472dae23"
-  name = "github.com/cenk/backoff"
+  digest = "1:f619cb9b07aebe5416262cdd8b86082e8d5bdc5264cb3b615ff858df0b645f97"
+  name = "github.com/cenkalti/backoff"
   packages = ["."]
   pruneopts = ""
-  revision = "61153c768f31ee5f130071d08fc82b85208528de"
-  version = "v1.1.0"
+  revision = "2ea60e5f094469f9e65adb9cd103795b73ae743e"
+  version = "v2.0.0"
 
 [[projects]]
   branch = "master"
-  digest = "1:face965f8776dc58310641e3a2a9b3cc4a0edd250caa172145407844c0d3cc85"
+  digest = "1:3169b959f9d03f802a190b4e66636c8ea077748b9d2b12020f782f3a48640857"
   name = "github.com/containerd/continuity"
   packages = ["pathdriver"]
   pruneopts = ""
-  revision = "1bed1ecb1dc42d8f4d2ac8c23e5cac64749e82c9"
+  revision = "f44b615e492bdfb371aae2f76ec694d9da1db537"
 
 [[projects]]
-  digest = "1:8e16e4366831fe6032ac6a46dab052eae36a6636240d2995783410e8a6eec095"
+  digest = "1:83a1a1cf1de52fbc4fb81327712f21bac825204d52424ac8c8b4d110be94eacb"
   name = "github.com/creasty/defaults"
   packages = ["."]
   pruneopts = ""
-  revision = "79c39719194bbe3c1a00f7909871aeac028849bf"
-  version = "v1.0.0"
-
-[[projects]]
-  digest = "1:70b925afae710bbc3ae6d14db042305801134043333a5a72d91fb280d9ad323e"
-  name = "github.com/docker/docker"
-  packages = [
-    "api/types",
-    "api/types/blkiodev",
-    "api/types/container",
-    "api/types/filters",
-    "api/types/mount",
-    "api/types/network",
-    "api/types/registry",
-    "api/types/strslice",
-    "api/types/swarm",
-    "api/types/swarm/runtime",
-    "api/types/versions",
-    "opts",
-    "pkg/archive",
-    "pkg/fileutils",
-    "pkg/homedir",
-    "pkg/idtools",
-    "pkg/ioutils",
-    "pkg/jsonmessage",
-    "pkg/longpath",
-    "pkg/mount",
-    "pkg/pools",
-    "pkg/stdcopy",
-    "pkg/system",
-    "pkg/term",
-    "pkg/term/windows",
-  ]
-  pruneopts = ""
-  revision = "0e037717e06f4f260f4e76d90675ccd1e9a6bed3"
+  revision = "a7e48e2230891fc7456c8ab918c424c5b06c3192"
+  version = "v1.2.1"
 
 [[projects]]
   digest = "1:a5ecc2e70260a87aa263811281465a5effcfae8a54bac319cee87c4625f04d63"
@@ -94,28 +61,12 @@
   version = "v0.3.0"
 
 [[projects]]
-  digest = "1:a406cae5eda48c01f8171bd47beb038751393f25ac06774ce04f9d6b0b703f17"
+  digest = "1:582d54fcb7233da8dde1dfd2210a5b9675d0685f84246a8d317b07d680c18b1b"
   name = "github.com/docker/go-units"
   packages = ["."]
   pruneopts = ""
-  revision = "0dadbb0345b35ec7ef35e228dabb8de89a65bf52"
-  version = "v0.3.2"
-
-[[projects]]
-  digest = "1:dbf4143ba1d4ff3d9f644d59af68ac8e41340bd2ff3aa96aa68e7024addcb13d"
-  name = "github.com/fsouza/go-dockerclient"
-  packages = ["."]
-  pruneopts = ""
-  revision = "ec5bc638fffd03d2a471db3ccfc9afada35bb0f8"
-  version = "1.0"
-
-[[projects]]
-  digest = "1:70a80170917a15e1ff02faab5f9e716e945e0676e86599ba144d38f96e30c3bf"
-  name = "github.com/gogo/protobuf"
-  packages = ["proto"]
-  pruneopts = ""
-  revision = "342cbe0a04158f6dcb03ca0079991a51a4248c02"
-  version = "v0.5"
+  revision = "47565b4f722fb6ceae66b95f853feed578a4a51c"
+  version = "v0.3.3"
 
 [[projects]]
   digest = "1:dcf8316121302735c0ac84e05f4686e3b34e284444435e9a206da48d8be18cb1"
@@ -148,15 +99,45 @@
   version = "v1.0.1"
 
 [[projects]]
-  digest = "1:fa19ddee0e5ee5951a6a450a4b6ec635a42957f86bfc87d9d778eeee04ad2036"
+  digest = "1:0d069300443e77049f71a4f9dc1539ba246c8f0c0f140cd9587f0153dd978c20"
   name = "github.com/opencontainers/runc"
+  packages = ["libcontainer/user"]
+  pruneopts = ""
+  revision = "4fc53a81fb7c994640722ac585fa9ca548971871"
+  version = "v1.0.0-rc5"
+
+[[projects]]
+  digest = "1:fbef214fe15bb267e947cd09bd054d50e5d4e690829de671590e8706e84cfd4c"
+  name = "github.com/ory/dockertest"
   packages = [
-    "libcontainer/system",
-    "libcontainer/user",
+    "docker",
+    "docker/opts",
+    "docker/pkg/archive",
+    "docker/pkg/fileutils",
+    "docker/pkg/homedir",
+    "docker/pkg/idtools",
+    "docker/pkg/ioutils",
+    "docker/pkg/jsonmessage",
+    "docker/pkg/longpath",
+    "docker/pkg/mount",
+    "docker/pkg/pools",
+    "docker/pkg/stdcopy",
+    "docker/pkg/system",
+    "docker/pkg/term",
+    "docker/pkg/term/windows",
+    "docker/types",
+    "docker/types/blkiodev",
+    "docker/types/container",
+    "docker/types/filters",
+    "docker/types/mount",
+    "docker/types/network",
+    "docker/types/registry",
+    "docker/types/strslice",
+    "docker/types/versions",
   ]
   pruneopts = ""
-  revision = "baf6536d6259209c3edfa2b22237af82942d3dfa"
-  version = "v0.1.1"
+  revision = "9f1141b78507d23603f6be530587664ebb63a8d2"
+  version = "v3.3.2"
 
 [[projects]]
   digest = "1:7365acd48986e205ccb8652cc746f09c8b7876030d53710ea6ef7d0bd0dcd7ca"
@@ -167,50 +148,47 @@
   version = "v0.8.0"
 
 [[projects]]
-  digest = "1:3ac248add5bb40a3c631c5334adcd09aa72d15af2768a5bc0274084ea7b2e5ba"
+  digest = "1:3fcbf733a8d810a21265a7f2fe08a3353db2407da052b233f8b204b5afc03d9b"
   name = "github.com/sirupsen/logrus"
   packages = ["."]
   pruneopts = ""
-  revision = "f006c2ac4710855cf0f916dd6b77acf6b048dc6e"
-  version = "v1.0.3"
+  revision = "3e01752db0189b9157070a0e1668a620f9a85da2"
+  version = "v1.0.6"
 
 [[projects]]
   branch = "master"
-  digest = "1:f6a006d27619a4d93bf9b66fe1999b8c8d1fa62bdc63af14f10fbe6fcaa2aa1a"
+  digest = "1:b2d8b39397ca07929a3de3a3fd2b6ca4c8d48e9cadaa7cf2b083e27fd9e78107"
   name = "golang.org/x/crypto"
   packages = ["ssh/terminal"]
   pruneopts = ""
-  revision = "9f005a07e0d31d45e6656d241bb5c0f2efd4bc94"
+  revision = "0709b304e793a5edb4a2c0145f281ecdc20838a4"
 
 [[projects]]
   branch = "master"
-  digest = "1:130b1bec86c62e121967ee0c69d9c263dc2d3ffe6c7c9a82aca4071c4d068861"
+  digest = "1:782723d6fc27d202f1943219d68d58b3f6bcab6212c85294b1ddd8b586b1d356"
   name = "golang.org/x/net"
-  packages = [
-    "context",
-    "context/ctxhttp",
-  ]
+  packages = ["context"]
   pruneopts = ""
-  revision = "9dfe39835686865bff950a07b394c12a98ddc811"
+  revision = "161cd47e91fd58ac17490ef4d742dc98bb4cf60e"
 
 [[projects]]
   branch = "master"
-  digest = "1:12a3d1f9268da0db1041ea3a91434d2b528efcf54dc3eb36f48f473d82eba18b"
+  digest = "1:ed900376500543ca05f2a2383e1f541b4606f19cd22f34acb81b17a0b90c7f3e"
   name = "golang.org/x/sys"
   packages = [
     "unix",
     "windows",
   ]
   pruneopts = ""
-  revision = "0ac51a24ef1c37380f98ba8b98f56e3bffd59850"
+  revision = "d0be0721c37eeb5299f245a996a483160fc36940"
 
 [[projects]]
-  digest = "1:7774ce241e4f9825cce2cf7c696181fdbd0944ccf4cde0463279bbf25c06dc97"
+  digest = "1:fbef214fe15bb267e947cd09bd054d50e5d4e690829de671590e8706e84cfd4c"
   name = "gopkg.in/ory-am/dockertest.v3"
   packages = ["."]
   pruneopts = ""
-  revision = "a7951f7a8442f0e70d36e499ed4d744f00af2963"
-  version = "v3.0.9"
+  revision = "9f1141b78507d23603f6be530587664ebb63a8d2"
+  version = "v3.3.2"
 
 [solve-meta]
   analyzer-name = "dep"

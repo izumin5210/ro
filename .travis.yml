@@ -5,23 +5,48 @@ sudo: required
 services:
   - docker
 
-go:
-- 1.8
-- 1.9
+matrix:
+  include:
+  - go: "1.9"
+    env:
+    - DEP_ENABLED=1
+  - go: "1.10"
+    env:
+    - DEP_ENABLED=1
+  - go: "1.11"
+    env:
+    - DEP_ENABLED=1
+  - go: "1.11"
+    env:
+    - GO111MODULE=on
+    - COVER_ENABLED=1
 
 cache:
   directories:
-  - vendor
+  - $GOPATH/pkg/dep
+  - $GOPATH/pkg/mod
 
 before_install:
-- go get -u github.com/golang/dep/cmd/dep
 - go get -u github.com/golang/lint/golint
+- |
+  if [ "$DEP_ENABLED" = 1 ]; then
+    go get -u github.com/golang/dep/cmd/dep;
+  fi
 
 install:
-- make dep
+- |
+  if [ "$DEP_ENABLED" = 1 ]; then
+    dep ensure -v -vendor-only;
+  fi
 
 script:
-- make cover
+- go list ./... | xargs golint -set_exit_status
+- |
+  if [ "$COVER_ENABLED" = 1 ]; then
+    go test -v -coverpkg ./... -coverprofile coverage.txt -covermode atomic ./...;
+  else
+    go test -v ./...;
+  fi
 
 after_success:
 - bash <(curl -s https://codecov.io/bash)
