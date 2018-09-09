@@ -4,7 +4,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/garyburd/redigo/redis"
+	"github.com/gomodule/redigo/redis"
 
 	"github.com/izumin5210/ro/internal/config"
 	"github.com/izumin5210/ro/internal/testing"

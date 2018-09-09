@@ -22,8 +22,8 @@
 
 
 [[constraint]]
-  name = "github.com/garyburd/redigo"
-  version = "^1.0"
+  name = "github.com/gomodule/redigo"
+  version = "^2.0"
 
 [[constraint]]
   name = "gopkg.in/ory-am/dockertest.v3"
