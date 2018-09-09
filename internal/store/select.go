@@ -3,7 +3,7 @@ package store
 import (
 	"reflect"
 
-	"github.com/garyburd/redigo/redis"
+	"github.com/gomodule/redigo/redis"
 	"github.com/pkg/errors"
 
 	"github.com/izumin5210/ro/types"
