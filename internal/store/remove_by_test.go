@@ -7,7 +7,8 @@ import (
 	"github.com/gomodule/redigo/redis"
 
 	"github.com/izumin5210/ro/internal/config"
-	"github.com/izumin5210/ro/internal/testing"
+	rotesting "github.com/izumin5210/ro/internal/testing"
+	"github.com/izumin5210/ro/rq"
 )
 
 func TestRemoveBy(t *testing.T) {
@@ -56,10 +57,11 @@ func TestRemoveBy(t *testing.T) {
 		t.Errorf("Unexpected error: %v", err)
 	}
 
-	q := store.Query("recent").
-		Gt(now.Add(-2 * 60 * time.Second).UnixNano()).
-		LtEq(now.Add(1 * 60 * time.Second).UnixNano())
-	err = store.RemoveBy(q)
+	err = store.RemoveBy(
+		rq.Key("recent"),
+		rq.Gt(now.Add(-2*60*time.Second).UnixNano()),
+		rq.LtEq(now.Add(1*60*time.Second).UnixNano()),
+	)
 	if err != nil {
 		t.Errorf("Unexpected error: %v", err)
 	}

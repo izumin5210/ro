@@ -3,14 +3,14 @@ package store
 import (
 	"github.com/pkg/errors"
 
-	"github.com/izumin5210/ro/types"
+	"github.com/izumin5210/ro/rq"
 )
 
 // RemoveBy implements the types.Store interface.
-func (s *ConcreteStore) RemoveBy(q types.Query) error {
-	keys, err := s.selectKeys(q)
+func (s *ConcreteStore) RemoveBy(mods ...rq.Modifier) error {
+	keys, err := s.selectKeys(mods)
 	if err != nil {
-		return errors.Wrapf(err, "failed to select keys %v", q)
+		return errors.WithStack(err)
 	}
 	err = s.removeByKeys(keys)
 	if err != nil {
