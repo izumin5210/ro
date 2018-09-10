@@ -8,7 +8,8 @@ import (
 
 	"github.com/gomodule/redigo/redis"
 
-	"github.com/izumin5210/ro/internal/testing"
+	rotesting "github.com/izumin5210/ro/internal/testing"
+	"github.com/izumin5210/ro/rq"
 )
 
 type Post struct {
@@ -26,7 +27,7 @@ func (p *Post) GetKeySuffix() string {
 
 func (p *Post) GetScoreMap() map[string]interface{} {
 	return map[string]interface{}{
-		"recent": p.CreatedAt,
+		"recent":                         p.CreatedAt,
 		fmt.Sprintf("user:%d", p.UserID): p.CreatedAt,
 	}
 }
@@ -144,7 +145,7 @@ func Example_select() {
 	defer cleanup()
 
 	posts := []*Post{}
-	postStore.Select(&posts, postStore.Query("recent").GtEq(now.UnixNano()).Reverse())
+	postStore.Select(&posts, rq.Key("recent"), rq.GtEq(now.UnixNano()), rq.Reverse())
 	fmt.Println(posts[0].Body)
 	fmt.Println(posts[1].Body)
 	// Output:
@@ -156,7 +157,7 @@ func Example_count() {
 	setup()
 	defer cleanup()
 
-	cnt, _ := postStore.Count(postStore.Query("user:1").LtEq(now.UnixNano()))
+	cnt, _ := postStore.Count(rq.Key("user", 1), rq.LtEq(now.UnixNano()))
 	fmt.Println(cnt)
 	// Output:
 	// 2
