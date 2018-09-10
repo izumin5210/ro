@@ -7,6 +7,7 @@ import (
 	"github.com/gomodule/redigo/redis"
 	"github.com/pkg/errors"
 
+	"github.com/izumin5210/ro/rq"
 	"github.com/izumin5210/ro/types"
 )
 
@@ -43,10 +44,20 @@ func (s *ConcreteStore) toModel(rv reflect.Value) (types.Model, error) {
 	return m, nil
 }
 
-func (s *ConcreteStore) selectKeys(query types.Query) ([]string, error) {
+func (s *ConcreteStore) selectKeys(mods []rq.Modifier) ([]string, error) {
 	conn := s.getConn()
 	defer conn.Close()
 
-	cmd, args := query.Build()
-	return redis.Strings(conn.Do(cmd, args...))
+	cmd, err := s.injectKeyPrefix(rq.List(mods...)).Build()
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+	return redis.Strings(conn.Do(cmd.Name, cmd.Args...))
+}
+
+func (s *ConcreteStore) injectKeyPrefix(q *rq.Query) *rq.Query {
+	if q.Key.Prefix == "" {
+		q.Key.Prefix = s.KeyPrefix
+	}
+	return q
 }

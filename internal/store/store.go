@@ -3,7 +3,6 @@ package store
 import (
 	"reflect"
 
-	"github.com/izumin5210/ro/internal/query"
 	"github.com/izumin5210/ro/types"
 )
 
@@ -29,9 +28,4 @@ func New(getConnFunc types.GetConnFunc, model types.Model, cnf *types.StoreConfi
 		model:       model,
 		modelType:   modelType,
 	}, nil
-}
-
-// Query implements the types.Store interface.
-func (s *ConcreteStore) Query(key string) types.Query {
-	return query.New(s.getScoreSetKey(key))
 }

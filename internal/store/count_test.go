@@ -5,8 +5,8 @@ import (
 	"time"
 
 	"github.com/izumin5210/ro/internal/config"
-	"github.com/izumin5210/ro/internal/testing"
-	"github.com/izumin5210/ro/types"
+	rotesting "github.com/izumin5210/ro/internal/testing"
+	"github.com/izumin5210/ro/rq"
 )
 
 func TestCount(t *testing.T) {
@@ -65,66 +65,68 @@ func TestCount(t *testing.T) {
 
 	cases := []struct {
 		name  string
-		q     types.Query
+		mods  []rq.Modifier
 		count int
 	}{
 		{
 			name:  "id with no query params",
-			q:     store.Query("id"),
+			mods:  []rq.Modifier{rq.Key("id")},
 			count: 5,
 		},
 		{
 			name:  "recent with no query params",
-			q:     store.Query("recent"),
+			mods:  []rq.Modifier{rq.Key("recent")},
 			count: 5,
 		},
 		{
 			name:  "should ignore reverse",
-			q:     store.Query("id").Reverse(),
+			mods:  []rq.Modifier{rq.Key("id"), rq.Reverse()},
 			count: 5,
 		},
 		{
 			name:  "should ignore limit",
-			q:     store.Query("id").Limit(2),
+			mods:  []rq.Modifier{rq.Key("id"), rq.Limit(2)},
 			count: 5,
 		},
 		{
 			name:  "should ignore offset",
-			q:     store.Query("id").Offset(3),
+			mods:  []rq.Modifier{rq.Key("id"), rq.Offset(3)},
 			count: 5,
 		},
 		{
 			name:  "with Gt",
-			q:     store.Query("recent").Gt(now.UnixNano()),
+			mods:  []rq.Modifier{rq.Key("recent"), rq.Gt(now.UnixNano())},
 			count: 2,
 		},
 		{
 			name:  "with GtEq",
-			q:     store.Query("recent").GtEq(now.UnixNano()),
+			mods:  []rq.Modifier{rq.Key("recent"), rq.GtEq(now.UnixNano())},
 			count: 3,
 		},
 		{
 			name:  "with Lt",
-			q:     store.Query("recent").Gt(now.UnixNano()),
+			mods:  []rq.Modifier{rq.Key("recent"), rq.Lt(now.UnixNano())},
 			count: 2,
 		},
 		{
 			name:  "with LtEq",
-			q:     store.Query("recent").GtEq(now.UnixNano()),
+			mods:  []rq.Modifier{rq.Key("recent"), rq.LtEq(now.UnixNano())},
 			count: 3,
 		},
 		{
 			name: "with GtEq and Lt",
-			q: store.Query("recent").
-				GtEq(now.Add(-1 * 60 * 60 * time.Second).UnixNano()).
-				Lt(now.Add(1 * 60 * 60 * time.Second).UnixNano()),
+			mods: []rq.Modifier{
+				rq.Key("recent"),
+				rq.GtEq(now.Add(-1 * 60 * 60 * time.Second).UnixNano()),
+				rq.Lt(now.Add(1 * 60 * 60 * time.Second).UnixNano()),
+			},
 			count: 2,
 		},
 	}
 
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
-			cnt, err := store.Count(c.q)
+			cnt, err := store.Count(c.mods...)
 
 			if err != nil {
 				t.Errorf("Unexpected error: %v", err)
