@@ -9,6 +9,7 @@ import (
 
 func TestQuery_Build(t *testing.T) {
 	cases := []struct {
+		test  string
 		build func(...rq.Modifier) *rq.Query
 		mods  []rq.Modifier
 		cmd   *rq.Command
@@ -149,10 +150,26 @@ func TestQuery_Build(t *testing.T) {
 			mods:  []rq.Modifier{rq.Key("foo"), rq.GtEq(6), rq.LtEq(10)},
 			cmd:   &rq.Command{Name: "ZCOUNT", Args: []interface{}{"foo", 6, 10}},
 		},
+		{
+			test:  "without key",
+			build: rq.List,
+			mods:  []rq.Modifier{},
+			isErr: true,
+		},
+		{
+			test:  "unknown command type",
+			build: func(mods ...rq.Modifier) *rq.Query { return &rq.Query{Type: rq.CommandType(100)} },
+			mods:  []rq.Modifier{},
+			isErr: true,
+		},
 	}
 
 	for _, c := range cases {
-		t.Run(c.cmd.String(), func(t *testing.T) {
+		test := c.test
+		if test == "" {
+			test = c.cmd.String()
+		}
+		t.Run(test, func(t *testing.T) {
 			cmd, err := c.build(c.mods...).Build()
 
 			if c.isErr {

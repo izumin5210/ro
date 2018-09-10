@@ -59,7 +59,7 @@ type QueryKey struct {
 }
 
 // Build creates a key string.
-func (q *QueryKey) Build() string {
+func (q *QueryKey) Build() (string, error) {
 	delim := q.Delimiter
 	if delim == "" {
 		delim = DefaultKeyDelimiter
@@ -76,7 +76,10 @@ func (q *QueryKey) Build() string {
 		}
 		key = q.Prefix + prefixDelim + key
 	}
-	return key
+	if key == "" {
+		return "", errors.New("key is required")
+	}
+	return key, nil
 }
 
 // Query contains parameters to build a redis command.
@@ -92,72 +95,80 @@ type Query struct {
 
 // Build decide a redis command and args from query parameters.
 func (q *Query) Build() (*Command, error) {
-	name, err := q.decideCommandName()
-	if err != nil {
-		return nil, errors.WithStack(err)
-	}
-	args, err := q.buildArgs()
-	if err != nil {
-		return nil, errors.WithStack(err)
-	}
-	return &Command{Name: name, Args: args}, nil
-}
-
-func (q *Query) decideCommandName() (string, error) {
 	switch q.Type {
 	case CommandList:
-		if q.isWithScore() {
-			if q.Reverse {
-				return zrevrangeByScore, nil
-			}
-			return zrangeByScore, nil
+		cmd, err := q.buildListCommand()
+		if err != nil {
+			return nil, errors.WithStack(err)
 		}
+		return cmd, nil
+	case CommandCount:
+		cmd, err := q.buildCountCommand()
+		if err != nil {
+			return nil, errors.WithStack(err)
+		}
+		return cmd, nil
+	default:
+		return nil, newQueryError(q, "unknown query type")
+	}
+}
+
+func (q *Query) buildListCommand() (*Command, error) {
+	key, err := q.Key.Build()
+	if err != nil {
+		return nil, errors.WithStack(newQueryError(q, err.Error()))
+	}
+
+	cmd := &Command{Args: make([]interface{}, 1, 10)}
+	cmd.Args[0] = key
+
+	if q.isWithScore() {
+		min, max := q.getMinAndMax()
+
 		if q.Reverse {
-			return zrevrange, nil
+			cmd.Name = zrevrangeByScore
+			cmd.Args = append(cmd.Args, max, min)
+		} else {
+			cmd.Name = zrangeByScore
+			cmd.Args = append(cmd.Args, min, max)
 		}
-		return zrange, nil
-	case CommandCount:
-		if q.isWithScore() {
-			return zcount, nil
+
+		if q.Offset != 0 || q.Limit != -1 {
+			cmd.Args = append(cmd.Args, "LIMIT", q.Offset, q.Limit)
 		}
-		return zcard, nil
-	default:
-		return "", fmt.Errorf("unknown query type: %v", q.Type)
+	} else {
+		if q.Reverse {
+			cmd.Name = zrevrange
+		} else {
+			cmd.Name = zrange
+		}
+
+		end := q.Limit
+		if end > 0 {
+			end = q.Offset + q.Limit - 1
+		}
+		cmd.Args = append(cmd.Args, q.Offset, end)
 	}
+
+	return cmd, nil
 }
 
-func (q *Query) buildArgs() ([]interface{}, error) {
-	args := make([]interface{}, 0, 10)
-	switch q.Type {
-	case CommandList:
-		args = append(args, q.Key.Build())
-		if q.isWithScore() {
-			min, max := q.getMinAndMax()
-			if q.Reverse {
-				args = append(args, max, min)
-			} else {
-				args = append(args, min, max)
-			}
-			if q.Offset != 0 || q.Limit != -1 {
-				args = append(args, "LIMIT", q.Offset, q.Limit)
-			}
-		} else {
-			end := q.Limit
-			if end > 0 {
-				end = q.Offset + q.Limit - 1
-			}
-			args = append(args, q.Offset, end)
-		}
-	case CommandCount:
-		args = append(args, q.Key.Build())
-		if q.isWithScore() {
-			min, max := q.getMinAndMax()
-			args = append(args, min, max)
-		}
-	default:
-		return nil, fmt.Errorf("unknown query type: %v", q.Type)
+func (q *Query) buildCountCommand() (*Command, error) {
+	key, err := q.Key.Build()
+	if err != nil {
+		return nil, errors.WithStack(newQueryError(q, err.Error()))
 	}
-	return args, nil
+
+	cmd := &Command{Name: zcard, Args: make([]interface{}, 1, 10)}
+	cmd.Args[0] = key
+
+	if q.isWithScore() {
+		cmd.Name = zcount
+		min, max := q.getMinAndMax()
+		cmd.Args = append(cmd.Args, min, max)
+	}
+
+	return cmd, nil
 }
 
 func (q *Query) isWithScore() bool {
