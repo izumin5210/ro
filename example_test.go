@@ -41,7 +41,7 @@ func setup() {
 	now = time.Now()
 	postStore = New(pool, &Post{})
 
-	postStore.Set([]*Post{
+	postStore.Put([]*Post{
 		{
 			ID:        1,
 			UserID:    1,
@@ -80,11 +80,11 @@ func cleanup() {
 // Examples
 // ----------------------------------------------------------------
 
-func Example_set() {
+func Example_Store_Set() {
 	defer cleanup()
 	postStore = New(pool, &Post{})
 
-	postStore.Set([]*Post{
+	postStore.Put([]*Post{
 		{
 			ID:        1,
 			UserID:    1,
@@ -119,7 +119,7 @@ func Example_set() {
 	// This is a post 1
 }
 
-func Example_get() {
+func Example_Store_Get() {
 	setup()
 	defer cleanup()
 
@@ -130,12 +130,12 @@ func Example_get() {
 	// This is a post 1
 }
 
-func Example_select() {
+func Example_Store_List() {
 	setup()
 	defer cleanup()
 
 	posts := []*Post{}
-	postStore.Select(&posts, rq.Key("recent"), rq.GtEq(now.UnixNano()), rq.Reverse())
+	postStore.List(&posts, rq.Key("recent"), rq.GtEq(now.UnixNano()), rq.Reverse())
 	fmt.Println(posts[0].Body)
 	fmt.Println(posts[1].Body)
 	// Output:
@@ -143,7 +143,7 @@ func Example_select() {
 	// This is a post 1
 }
 
-func Example_count() {
+func Example_Store_Count() {
 	setup()
 	defer cleanup()
 

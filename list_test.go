@@ -9,7 +9,7 @@ import (
 	rotesting "github.com/izumin5210/ro/testing"
 )
 
-func TestSelect(t *testing.T) {
+func TestRedisStore_List(t *testing.T) {
 	defer teardown(t)
 
 	store := New(pool, &rotesting.Post{})
@@ -49,7 +49,7 @@ func TestSelect(t *testing.T) {
 	}
 
 	for _, p := range posts {
-		err := store.Set(p)
+		err := store.Put(p)
 
 		if err != nil {
 			t.Fatalf("Unexpected error: %v", err)
@@ -175,21 +175,21 @@ func TestSelect(t *testing.T) {
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
 			gotPosts := []*rotesting.Post{}
-			err := store.Select(&gotPosts, c.mods...)
+			err := store.List(&gotPosts, c.mods...)
 
 			if err != nil {
 				t.Errorf("Unexpected error: %v", err)
 			}
 
 			if got, want := len(gotPosts), len(c.order); got != want {
-				t.Errorf("Select() returned %d posts, want %d posts", got, want)
+				t.Errorf("List() returned %d posts, want %d posts", got, want)
 				return
 			}
 
 			for i, j := range c.order {
 				if got, want := gotPosts[i], posts[j]; !reflect.DeepEqual(got, want) {
 					cmd, _ := rq.List(c.mods...).Build()
-					t.Errorf("Select(%v)[%d] is %v, want %v", cmd, i, got, want)
+					t.Errorf("List(%v)[%d] is %v, want %v", cmd, i, got, want)
 				}
 			}
 		})

@@ -9,8 +9,8 @@ import (
 	"github.com/izumin5210/ro/rq"
 )
 
-// Select implements the types.Store interface.
-func (s *redisStore) Select(dest interface{}, mods ...rq.Modifier) error {
+// List implements the types.Store interface.
+func (s *redisStore) List(dest interface{}, mods ...rq.Modifier) error {
 	dt := reflect.ValueOf(dest)
 	if dt.Kind() != reflect.Ptr || dt.IsNil() {
 		return errors.New("must pass a slice ptr")

@@ -9,7 +9,7 @@ import (
 	rotesting "github.com/izumin5210/ro/testing"
 )
 
-func TestRemove(t *testing.T) {
+func TestRedisStore_Delete(t *testing.T) {
 	defer teardown(t)
 	now := time.Now().UTC()
 	posts := []*rotesting.Post{
@@ -34,12 +34,12 @@ func TestRemove(t *testing.T) {
 	}
 
 	store := New(pool, &rotesting.Post{})
-	err := store.Set(posts)
+	err := store.Put(posts)
 	if err != nil {
 		t.Errorf("Unexpected error: %v", err)
 	}
 
-	err = store.Remove(posts[0])
+	err = store.Delete(posts[0])
 	if err != nil {
 		t.Errorf("Unexpected error: %v", err)
 	}
@@ -72,7 +72,7 @@ func TestRemove(t *testing.T) {
 	}
 }
 
-func TestRemove_WithMultipleItems(t *testing.T) {
+func TestRedisStore_Delete_WithMultipleItems(t *testing.T) {
 	defer teardown(t)
 	now := time.Now().UTC()
 	posts := []*rotesting.Post{
@@ -97,12 +97,12 @@ func TestRemove_WithMultipleItems(t *testing.T) {
 	}
 
 	store := New(pool, &rotesting.Post{})
-	err := store.Set(posts)
+	err := store.Put(posts)
 	if err != nil {
 		t.Errorf("Unexpected error: %v", err)
 	}
 
-	err = store.Remove([]*rotesting.Post{posts[0], posts[2]})
+	err = store.Delete([]*rotesting.Post{posts[0], posts[2]})
 	if err != nil {
 		t.Errorf("Unexpected error: %v", err)
 	}
@@ -143,7 +143,7 @@ func TestRemove_WithMultipleItems(t *testing.T) {
 	}
 }
 
-func TestRemove_WhenDisableToStoreToHash(t *testing.T) {
+func TestRedisStore_Remove_WhenDisableToStoreToHash(t *testing.T) {
 	defer teardown(t)
 	now := time.Now().UTC()
 	posts := []*rotesting.Post{
@@ -168,12 +168,12 @@ func TestRemove_WhenDisableToStoreToHash(t *testing.T) {
 	}
 
 	store := New(pool, &rotesting.Post{}, WithHashStore(false))
-	err := store.Set(posts)
+	err := store.Put(posts)
 	if err != nil {
 		t.Errorf("Unexpected error: %v", err)
 	}
 
-	err = store.Remove(posts[0])
+	err = store.Delete(posts[0])
 	if err != nil {
 		t.Errorf("Unexpected error: %v", err)
 	}
