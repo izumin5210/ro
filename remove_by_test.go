@@ -1,4 +1,4 @@
-package store
+package ro
 
 import (
 	"testing"
@@ -6,9 +6,8 @@ import (
 
 	"github.com/gomodule/redigo/redis"
 
-	"github.com/izumin5210/ro/internal/config"
-	rotesting "github.com/izumin5210/ro/internal/testing"
 	"github.com/izumin5210/ro/rq"
+	rotesting "github.com/izumin5210/ro/testing"
 )
 
 func TestRemoveBy(t *testing.T) {
@@ -47,12 +46,8 @@ func TestRemoveBy(t *testing.T) {
 		},
 	}
 
-	cnf, _ := config.New()
-	store, err := New(pool.Get, &rotesting.Post{}, cnf)
-	if err != nil {
-		t.Errorf("Unexpected error: %v", err)
-	}
-	err = store.Set(posts)
+	store := New(pool, &rotesting.Post{})
+	err := store.Set(posts)
 	if err != nil {
 		t.Errorf("Unexpected error: %v", err)
 	}

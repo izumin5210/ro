@@ -1,23 +1,18 @@
-package store
+package ro
 
 import (
 	"reflect"
 	"testing"
 	"time"
 
-	"github.com/izumin5210/ro/internal/config"
-	rotesting "github.com/izumin5210/ro/internal/testing"
 	"github.com/izumin5210/ro/rq"
+	rotesting "github.com/izumin5210/ro/testing"
 )
 
 func TestSelect(t *testing.T) {
 	defer teardown(t)
 
-	cnf, _ := config.New()
-	store, err := New(pool.Get, &rotesting.Post{}, cnf)
-	if err != nil {
-		t.Fatalf("Unexpected error: %v", err)
-	}
+	store := New(pool, &rotesting.Post{})
 
 	now := time.Now().UTC()
 	posts := []*rotesting.Post{
@@ -54,7 +49,7 @@ func TestSelect(t *testing.T) {
 	}
 
 	for _, p := range posts {
-		err = store.Set(p)
+		err := store.Set(p)
 
 		if err != nil {
 			t.Fatalf("Unexpected error: %v", err)
@@ -180,7 +175,7 @@ func TestSelect(t *testing.T) {
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
 			gotPosts := []*rotesting.Post{}
-			err = store.Select(&gotPosts, c.mods...)
+			err := store.Select(&gotPosts, c.mods...)
 
 			if err != nil {
 				t.Errorf("Unexpected error: %v", err)

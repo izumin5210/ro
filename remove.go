@@ -1,4 +1,4 @@
-package store
+package ro
 
 import (
 	"reflect"
@@ -8,7 +8,7 @@ import (
 )
 
 // Remove implements the types.Store interface.
-func (s *ConcreteStore) Remove(src interface{}) error {
+func (s *redisStore) Remove(src interface{}) error {
 	keys := []string{}
 
 	rv := reflect.ValueOf(src)
@@ -43,8 +43,8 @@ func (s *ConcreteStore) Remove(src interface{}) error {
 	return nil
 }
 
-func (s *ConcreteStore) removeByKeys(keys []string) error {
-	conn := s.getConn()
+func (s *redisStore) removeByKeys(keys []string) error {
+	conn := s.pool.Get()
 	defer conn.Close()
 
 	keysByZsetKey := map[string][]string{}

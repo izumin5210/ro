@@ -1,17 +1,14 @@
-package store
+package ro
 
 import (
 	"github.com/gomodule/redigo/redis"
 	"github.com/pkg/errors"
-
-	"github.com/izumin5210/ro/types"
 )
 
-// Get implements the types.Store interface.
-func (s *ConcreteStore) Get(dests ...types.Model) error {
+func (s *redisStore) Get(dests ...Model) error {
 	var err error
 
-	conn := s.getConn()
+	conn := s.pool.Get()
 	defer conn.Close()
 
 	keys := make([]string, len(dests), len(dests))

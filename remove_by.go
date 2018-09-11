@@ -1,4 +1,4 @@
-package store
+package ro
 
 import (
 	"github.com/pkg/errors"
@@ -7,7 +7,7 @@ import (
 )
 
 // RemoveBy implements the types.Store interface.
-func (s *ConcreteStore) RemoveBy(mods ...rq.Modifier) error {
+func (s *redisStore) RemoveBy(mods ...rq.Modifier) error {
 	keys, err := s.selectKeys(mods)
 	if err != nil {
 		return errors.WithStack(err)

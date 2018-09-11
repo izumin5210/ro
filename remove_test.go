@@ -1,4 +1,4 @@
-package store
+package ro
 
 import (
 	"testing"
@@ -6,8 +6,7 @@ import (
 
 	"github.com/gomodule/redigo/redis"
 
-	"github.com/izumin5210/ro/internal/config"
-	"github.com/izumin5210/ro/internal/testing"
+	rotesting "github.com/izumin5210/ro/testing"
 )
 
 func TestRemove(t *testing.T) {
@@ -34,12 +33,8 @@ func TestRemove(t *testing.T) {
 		},
 	}
 
-	cnf, _ := config.New()
-	store, err := New(pool.Get, &rotesting.Post{}, cnf)
-	if err != nil {
-		t.Errorf("Unexpected error: %v", err)
-	}
-	err = store.Set(posts)
+	store := New(pool, &rotesting.Post{})
+	err := store.Set(posts)
 	if err != nil {
 		t.Errorf("Unexpected error: %v", err)
 	}
@@ -101,12 +96,8 @@ func TestRemove_WithMultipleItems(t *testing.T) {
 		},
 	}
 
-	cnf, _ := config.New()
-	store, err := New(pool.Get, &rotesting.Post{}, cnf)
-	if err != nil {
-		t.Errorf("Unexpected error: %v", err)
-	}
-	err = store.Set(posts)
+	store := New(pool, &rotesting.Post{})
+	err := store.Set(posts)
 	if err != nil {
 		t.Errorf("Unexpected error: %v", err)
 	}
@@ -176,14 +167,8 @@ func TestRemove_WhenDisableToStoreToHash(t *testing.T) {
 		},
 	}
 
-	cnf, _ := config.New()
-	cnf.HashStoreEnabled = false
-
-	store, err := New(pool.Get, &rotesting.Post{}, cnf)
-	if err != nil {
-		t.Errorf("Unexpected error: %v", err)
-	}
-	err = store.Set(posts)
+	store := New(pool, &rotesting.Post{}, WithHashStore(false))
+	err := store.Set(posts)
 	if err != nil {
 		t.Errorf("Unexpected error: %v", err)
 	}

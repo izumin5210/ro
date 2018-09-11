@@ -1,4 +1,4 @@
-package store
+package ro
 
 import (
 	"fmt"
@@ -10,10 +10,10 @@ import (
 )
 
 // Set implements the types.Store interface.
-func (s *ConcreteStore) Set(src interface{}) error {
+func (s *redisStore) Set(src interface{}) error {
 	var err error
 
-	conn := s.getConn()
+	conn := s.pool.Get()
 	defer conn.Close()
 
 	err = conn.Send("MULTI")
@@ -45,7 +45,7 @@ func (s *ConcreteStore) Set(src interface{}) error {
 	return nil
 }
 
-func (s *ConcreteStore) set(conn redis.Conn, src reflect.Value) error {
+func (s *redisStore) set(conn redis.Conn, src reflect.Value) error {
 	m, err := s.toModel(src)
 	if err != nil {
 		return errors.Wrap(err, "failed to convert to model")

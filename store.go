@@ -1,23 +1,43 @@
 package ro
 
 import (
-	"github.com/pkg/errors"
+	"reflect"
 
-	"github.com/izumin5210/ro/internal/config"
-	"github.com/izumin5210/ro/internal/store"
-	"github.com/izumin5210/ro/types"
+	"github.com/gomodule/redigo/redis"
+
+	"github.com/izumin5210/ro/rq"
 )
 
 // Store is an interface for providing CRUD operations for objects
 type Store interface {
-	types.Store
+	Set(src interface{}) error
+	Get(dests ...Model) error
+	Select(dest interface{}, mods ...rq.Modifier) error
+	Count(mods ...rq.Modifier) (int, error)
+	Remove(src interface{}) error
+	RemoveBy(mods ...rq.Modifier) error
 }
 
-// New creates a new store instance for given model objects
-func New(getConnFunc types.GetConnFunc, model types.Model, opts ...types.StoreOption) (Store, error) {
-	cnf, err := config.New(opts...)
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to initialize a config")
+// Pool is a pool of redis connections.
+type Pool interface {
+	Get() redis.Conn
+}
+
+type redisStore struct {
+	*Config
+	pool      Pool
+	model     Model
+	modelType reflect.Type
+}
+
+// New creates a redisStore instance
+func New(pool Pool, model Model, opts ...Option) Store {
+	modelType := reflect.ValueOf(model).Elem().Type()
+
+	return &redisStore{
+		Config:    createConfig(modelType, opts),
+		pool:      pool,
+		model:     model,
+		modelType: modelType,
 	}
-	return store.New(getConnFunc, model, cnf)
 }
