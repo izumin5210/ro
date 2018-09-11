@@ -10,7 +10,7 @@ import (
 	rotesting "github.com/izumin5210/ro/testing"
 )
 
-func TestRemoveBy(t *testing.T) {
+func TestRedisStore_DeleteAll(t *testing.T) {
 	defer teardown(t)
 	now := time.Now().UTC()
 	posts := []*rotesting.Post{
@@ -47,12 +47,12 @@ func TestRemoveBy(t *testing.T) {
 	}
 
 	store := New(pool, &rotesting.Post{})
-	err := store.Set(posts)
+	err := store.Put(posts)
 	if err != nil {
 		t.Errorf("Unexpected error: %v", err)
 	}
 
-	err = store.RemoveBy(
+	err = store.DeleteAll(
 		rq.Key("recent"),
 		rq.Gt(now.Add(-2*60*time.Second).UnixNano()),
 		rq.LtEq(now.Add(1*60*time.Second).UnixNano()),

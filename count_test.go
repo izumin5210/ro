@@ -8,7 +8,7 @@ import (
 	rotesting "github.com/izumin5210/ro/testing"
 )
 
-func TestCount(t *testing.T) {
+func TestRedisStore_Count(t *testing.T) {
 	defer teardown(t)
 
 	store := New(pool, &rotesting.Post{})
@@ -48,7 +48,7 @@ func TestCount(t *testing.T) {
 	}
 
 	for _, p := range posts {
-		err := store.Set(p)
+		err := store.Put(p)
 
 		if err != nil {
 			t.Fatalf("Unexpected error: %v", err)

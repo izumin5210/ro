@@ -9,7 +9,7 @@ import (
 	rotesting "github.com/izumin5210/ro/testing"
 )
 
-func TestGet(t *testing.T) {
+func TestRedisStore_Get(t *testing.T) {
 	defer teardown(t)
 	store := New(pool, &rotesting.Post{})
 	posts := []*rotesting.Post{

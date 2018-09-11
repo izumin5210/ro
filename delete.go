@@ -7,8 +7,8 @@ import (
 	"github.com/pkg/errors"
 )
 
-// Remove implements the types.Store interface.
-func (s *redisStore) Remove(src interface{}) error {
+// Delete implements the types.Store interface.
+func (s *redisStore) Delete(src interface{}) error {
 	keys := []string{}
 
 	rv := reflect.ValueOf(src)
@@ -36,14 +36,14 @@ func (s *redisStore) Remove(src interface{}) error {
 		keys = append(keys, key)
 	}
 
-	err := s.removeByKeys(keys)
+	err := s.deleteByKeys(keys)
 	if err != nil {
 		return errors.Wrapf(err, "failed to remove by keys %v", keys)
 	}
 	return nil
 }
 
-func (s *redisStore) removeByKeys(keys []string) error {
+func (s *redisStore) deleteByKeys(keys []string) error {
 	conn := s.pool.Get()
 	defer conn.Close()
 

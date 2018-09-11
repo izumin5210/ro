@@ -6,13 +6,13 @@ import (
 	"github.com/izumin5210/ro/rq"
 )
 
-// RemoveBy implements the types.Store interface.
-func (s *redisStore) RemoveBy(mods ...rq.Modifier) error {
+// DeleteAll implements the types.Store interface.
+func (s *redisStore) DeleteAll(mods ...rq.Modifier) error {
 	keys, err := s.selectKeys(mods)
 	if err != nil {
 		return errors.WithStack(err)
 	}
-	err = s.removeByKeys(keys)
+	err = s.deleteByKeys(keys)
 	if err != nil {
 		return errors.Wrapf(err, "failed to remove by keys %v", keys)
 	}

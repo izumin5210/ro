@@ -9,8 +9,8 @@ import (
 	"github.com/pkg/errors"
 )
 
-// Set implements the types.Store interface.
-func (s *redisStore) Set(src interface{}) error {
+// Put implements the types.Store interface.
+func (s *redisStore) Put(src interface{}) error {
 	var err error
 
 	conn := s.pool.Get()
