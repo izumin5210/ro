@@ -10,12 +10,12 @@ import (
 
 // Store is an interface for providing CRUD operations for objects
 type Store interface {
-	Set(src interface{}) error
+	List(dest interface{}, mods ...rq.Modifier) error
 	Get(dests ...Model) error
-	Select(dest interface{}, mods ...rq.Modifier) error
+	Put(src interface{}) error
+	Delete(src interface{}) error
+	DeleteAll(mods ...rq.Modifier) error
 	Count(mods ...rq.Modifier) (int, error)
-	Remove(src interface{}) error
-	RemoveBy(mods ...rq.Modifier) error
 }
 
 // Pool is a pool of redis connections.
