@@ -2,13 +2,10 @@ package ro
 
 import (
 	"fmt"
-	"os"
-	"testing"
 	"time"
 
 	"github.com/gomodule/redigo/redis"
 
-	rotesting "github.com/izumin5210/ro/internal/testing"
 	"github.com/izumin5210/ro/rq"
 )
 
@@ -36,21 +33,13 @@ func (p *Post) GetScoreMap() map[string]interface{} {
 // ----------------------------------------------------------------
 
 var (
-	pool      *rotesting.Pool
 	postStore Store
 	now       time.Time
 )
 
-func TestMain(m *testing.M) {
-	pool = rotesting.MustCreate()
-	defer pool.MustClose()
-	postStore, _ = New(pool.Get, &Post{})
-
-	os.Exit(m.Run())
-}
-
 func setup() {
 	now = time.Now()
+	postStore = New(pool, &Post{})
 
 	postStore.Set([]*Post{
 		{
@@ -93,6 +82,7 @@ func cleanup() {
 
 func Example_set() {
 	defer cleanup()
+	postStore = New(pool, &Post{})
 
 	postStore.Set([]*Post{
 		{

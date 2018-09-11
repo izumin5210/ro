@@ -1,4 +1,4 @@
-package store
+package ro
 
 import (
 	"reflect"
@@ -10,7 +10,7 @@ import (
 )
 
 // Select implements the types.Store interface.
-func (s *ConcreteStore) Select(dest interface{}, mods ...rq.Modifier) error {
+func (s *redisStore) Select(dest interface{}, mods ...rq.Modifier) error {
 	dt := reflect.ValueOf(dest)
 	if dt.Kind() != reflect.Ptr || dt.IsNil() {
 		return errors.New("must pass a slice ptr")
@@ -25,7 +25,7 @@ func (s *ConcreteStore) Select(dest interface{}, mods ...rq.Modifier) error {
 		return errors.Wrap(err, "failed to select query")
 	}
 
-	conn := s.getConn()
+	conn := s.pool.Get()
 	defer conn.Close()
 
 	for _, key := range keys {

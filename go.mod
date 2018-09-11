@@ -11,6 +11,7 @@ require (
 	github.com/docker/go-connections v0.3.0 // indirect
 	github.com/docker/go-units v0.3.3 // indirect
 	github.com/fsnotify/fsnotify v1.4.7 // indirect
+	github.com/golang/go v0.0.0-20180911122522-95a11c7381e0
 	github.com/golang/protobuf v1.2.0 // indirect
 	github.com/gomodule/redigo v2.0.0+incompatible
 	github.com/google/go-cmp v0.2.0 // indirect

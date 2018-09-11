@@ -1,4 +1,4 @@
-package store
+package ro
 
 import (
 	"fmt"
@@ -9,8 +9,7 @@ import (
 
 	"github.com/gomodule/redigo/redis"
 
-	"github.com/izumin5210/ro/internal/config"
-	"github.com/izumin5210/ro/internal/testing"
+	rotesting "github.com/izumin5210/ro/testing"
 )
 
 func TestSet(t *testing.T) {
@@ -23,12 +22,8 @@ func TestSet(t *testing.T) {
 		UpdatedAt: now.UnixNano(),
 	}
 
-	cnf, _ := config.New()
-	store, err := New(pool.Get, &rotesting.Post{}, cnf)
-	if err != nil {
-		t.Errorf("Unexpected error: %v", err)
-	}
-	err = store.Set(post)
+	store := New(pool, &rotesting.Post{})
+	err := store.Set(post)
 
 	if err != nil {
 		t.Errorf("Unexpected error: %v", err)
@@ -106,12 +101,8 @@ func TestSet_WithMultipleItems(t *testing.T) {
 		},
 	}
 
-	cnf, _ := config.New()
-	store, err := New(pool.Get, &rotesting.Post{}, cnf)
-	if err != nil {
-		t.Errorf("Unexpected error: %v", err)
-	}
-	err = store.Set(posts)
+	store := New(pool, &rotesting.Post{})
+	err := store.Set(posts)
 	if err != nil {
 		t.Errorf("Unexpected error: %v", err)
 	}
@@ -173,13 +164,8 @@ func TestSet_WhenDisableToStoreToHash(t *testing.T) {
 		UpdatedAt: now.UnixNano(),
 	}
 
-	cnf, _ := config.New()
-	cnf.HashStoreEnabled = false
-	store, err := New(pool.Get, &rotesting.Post{}, cnf)
-	if err != nil {
-		t.Errorf("Unexpected error: %v", err)
-	}
-	err = store.Set(post)
+	store := New(pool, &rotesting.Post{}, WithHashStore(false))
+	err := store.Set(post)
 
 	if err != nil {
 		t.Errorf("Unexpected error: %v", err)
@@ -214,15 +200,10 @@ func (d *DummyWithEmptyKeySuffix) GetScoreMap() map[string]interface{} {
 }
 
 func TestSet_WhenKeySuffixIsEmpty(t *testing.T) {
-	cnf, _ := config.New()
-	cnf.HashStoreEnabled = false
-	store, err := New(pool.Get, &DummyWithEmptyKeySuffix{}, cnf)
-	if err != nil {
-		t.Errorf("Unexpected error: %v", err)
-	}
+	store := New(pool, &DummyWithEmptyKeySuffix{}, WithHashStore(false))
 
 	dummy := &DummyWithEmptyKeySuffix{}
-	err = store.Set(dummy)
+	err := store.Set(dummy)
 
 	if err == nil {
 		t.Error("Set() with an empty key suffix should return an error")
@@ -247,15 +228,9 @@ func (d *DummyWithNilScoreMap) GetKeySuffix() string                { return "te
 func (d *DummyWithNilScoreMap) GetScoreMap() map[string]interface{} { return nil }
 
 func TestSet_WithScoreMapIsNil(t *testing.T) {
-	cnf, _ := config.New()
-	cnf.HashStoreEnabled = false
-	store, err := New(pool.Get, &DummyWithNilScoreMap{}, cnf)
-	if err != nil {
-		t.Errorf("Unexpected error: %v", err)
-	}
-
+	store := New(pool, &DummyWithNilScoreMap{}, WithHashStore(false))
 	dummy := &DummyWithNilScoreMap{}
-	err = store.Set(dummy)
+	err := store.Set(dummy)
 
 	if err == nil {
 		t.Error("Set() with nil score map should return an error")
@@ -282,15 +257,9 @@ func (d *DummyWithEmptyScoreKey) GetScoreMap() map[string]interface{} {
 }
 
 func TestSet_WithEmptyScoreKey(t *testing.T) {
-	cnf, _ := config.New()
-	cnf.HashStoreEnabled = false
-	store, err := New(pool.Get, &DummyWithEmptyScoreKey{}, cnf)
-	if err != nil {
-		t.Errorf("Unexpected error: %v", err)
-	}
-
+	store := New(pool, &DummyWithEmptyScoreKey{}, WithHashStore(false))
 	dummy := &DummyWithEmptyScoreKey{}
-	err = store.Set(dummy)
+	err := store.Set(dummy)
 
 	if err == nil {
 		t.Error("Set() with empty score key should return an error")
@@ -317,15 +286,9 @@ func (d *DummyWithNotNumberScore) GetScoreMap() map[string]interface{} {
 }
 
 func TestSet_WithNotNumberScore(t *testing.T) {
-	cnf, _ := config.New()
-	cnf.HashStoreEnabled = false
-	store, err := New(pool.Get, &DummyWithNotNumberScore{}, cnf)
-	if err != nil {
-		t.Errorf("Unexpected error: %v", err)
-	}
-
+	store := New(pool, &DummyWithNotNumberScore{}, WithHashStore(false))
 	dummy := &DummyWithNotNumberScore{}
-	err = store.Set(dummy)
+	err := store.Set(dummy)
 
 	if err == nil {
 		t.Error("Set() with not number score should return an error")
@@ -352,15 +315,9 @@ func (d *DummyWithTooLargeScore) GetScoreMap() map[string]interface{} {
 }
 
 func TestSet_WithTooLargeNumberScore(t *testing.T) {
-	cnf, _ := config.New()
-	cnf.HashStoreEnabled = false
-	store, err := New(pool.Get, &DummyWithTooLargeScore{}, cnf)
-	if err != nil {
-		t.Errorf("Unexpected error: %v", err)
-	}
-
+	store := New(pool, &DummyWithTooLargeScore{}, WithHashStore(false))
 	dummy := &DummyWithTooLargeScore{}
-	err = store.Set(dummy)
+	err := store.Set(dummy)
 
 	if err == nil {
 		t.Error("Set() with not number score should return an error")
@@ -392,15 +349,9 @@ func (d *DummyWithStringNumberScore) GetScoreMap() map[string]interface{} {
 }
 
 func TestSet_WithStringNumberScore(t *testing.T) {
-	cnf, _ := config.New()
-	cnf.HashStoreEnabled = false
-	store, err := New(pool.Get, &DummyWithStringNumberScore{}, cnf)
-	if err != nil {
-		t.Errorf("Unexpected error: %v", err)
-	}
-
+	store := New(pool, &DummyWithStringNumberScore{}, WithHashStore(false))
 	dummy := &DummyWithStringNumberScore{}
-	err = store.Set(dummy)
+	err := store.Set(dummy)
 
 	if err != nil {
 		t.Errorf("Unexpected error: %v", err)

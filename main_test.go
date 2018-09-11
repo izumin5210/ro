@@ -1,11 +1,11 @@
-package store
+package ro
 
 import (
 	"log"
 	"os"
 	"testing"
 
-	"github.com/izumin5210/ro/internal/testing"
+	rotesting "github.com/izumin5210/ro/testing"
 )
 
 var pool *rotesting.Pool

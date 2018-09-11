@@ -1,4 +1,4 @@
-package store
+package ro
 
 import (
 	"github.com/gomodule/redigo/redis"
@@ -8,8 +8,8 @@ import (
 )
 
 // Count implements the types.Store interface.
-func (s *ConcreteStore) Count(mods ...rq.Modifier) (int, error) {
-	conn := s.getConn()
+func (s *redisStore) Count(mods ...rq.Modifier) (int, error) {
+	conn := s.pool.Get()
 	defer conn.Close()
 
 	cmd, err := s.injectKeyPrefix(rq.Count(mods...)).Build()

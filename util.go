@@ -1,4 +1,4 @@
-package store
+package ro
 
 import (
 	"fmt"
@@ -8,10 +8,9 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/izumin5210/ro/rq"
-	"github.com/izumin5210/ro/types"
 )
 
-func (s *ConcreteStore) getKey(m types.Model) (string, error) {
+func (s *redisStore) getKey(m Model) (string, error) {
 	suffix := m.GetKeySuffix()
 	if len(suffix) == 0 {
 		return "", errors.New("GetKeySuffix() should be present")
@@ -19,22 +18,22 @@ func (s *ConcreteStore) getKey(m types.Model) (string, error) {
 	return s.KeyPrefix + s.KeyDelimiter + suffix, nil
 }
 
-func (s *ConcreteStore) getScoreSetKey(key string) string {
+func (s *redisStore) getScoreSetKey(key string) string {
 	return s.KeyPrefix + s.ScoreKeyDelimiter + key
 }
 
-func (s *ConcreteStore) getScoreSetKeysKeyByKey(key string) string {
+func (s *redisStore) getScoreSetKeysKeyByKey(key string) string {
 	return key + s.KeyDelimiter + s.ScoreSetKeysKeySuffix
 }
 
-func (s *ConcreteStore) toModel(rv reflect.Value) (types.Model, error) {
+func (s *redisStore) toModel(rv reflect.Value) (Model, error) {
 	if rv.Type() != s.modelType && rv.Type().Elem() != s.modelType {
 		return nil, fmt.Errorf("%s is not a %v", rv.Interface(), s.modelType)
 	}
 
-	m, ok := rv.Interface().(types.Model)
+	m, ok := rv.Interface().(Model)
 	if !ok {
-		return nil, fmt.Errorf("failed to cast %v to types.Model", rv.Interface())
+		return nil, fmt.Errorf("failed to cast %v to ro.IModel", rv.Interface())
 	}
 
 	if len(m.GetKeySuffix()) == 0 {
@@ -44,8 +43,8 @@ func (s *ConcreteStore) toModel(rv reflect.Value) (types.Model, error) {
 	return m, nil
 }
 
-func (s *ConcreteStore) selectKeys(mods []rq.Modifier) ([]string, error) {
-	conn := s.getConn()
+func (s *redisStore) selectKeys(mods []rq.Modifier) ([]string, error) {
+	conn := s.pool.Get()
 	defer conn.Close()
 
 	cmd, err := s.injectKeyPrefix(rq.List(mods...)).Build()
@@ -55,7 +54,7 @@ func (s *ConcreteStore) selectKeys(mods []rq.Modifier) ([]string, error) {
 	return redis.Strings(conn.Do(cmd.Name, cmd.Args...))
 }
 
-func (s *ConcreteStore) injectKeyPrefix(q *rq.Query) *rq.Query {
+func (s *redisStore) injectKeyPrefix(q *rq.Query) *rq.Query {
 	if q.Key.Prefix == "" {
 		q.Key.Prefix = s.KeyPrefix
 	}

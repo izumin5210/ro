@@ -1,4 +1,4 @@
-package store
+package ro
 
 import (
 	"reflect"
@@ -6,18 +6,12 @@ import (
 
 	"github.com/gomodule/redigo/redis"
 
-	"github.com/izumin5210/ro/internal/config"
-	"github.com/izumin5210/ro/internal/testing"
+	rotesting "github.com/izumin5210/ro/testing"
 )
 
 func TestGet(t *testing.T) {
 	defer teardown(t)
-	cnf, _ := config.New()
-	store, err := New(pool.Get, &rotesting.Post{}, cnf)
-	if err != nil {
-		t.Errorf("Unexpected error: %v", err)
-	}
-
+	store := New(pool, &rotesting.Post{})
 	posts := []*rotesting.Post{
 		{
 			ID:    1,
@@ -38,7 +32,7 @@ func TestGet(t *testing.T) {
 
 	t.Run("single get", func(t *testing.T) {
 		gotPost := &rotesting.Post{ID: 2}
-		err = store.Get(gotPost)
+		err := store.Get(gotPost)
 
 		if err != nil {
 			t.Errorf("Unexpected error: %v", err)
@@ -50,7 +44,7 @@ func TestGet(t *testing.T) {
 
 	t.Run("multi get", func(t *testing.T) {
 		gotPosts := []*rotesting.Post{{ID: 2}, {ID: 1}}
-		err = store.Get(gotPosts[0], gotPosts[1])
+		err := store.Get(gotPosts[0], gotPosts[1])
 
 		if err != nil {
 			t.Errorf("Unexpected error: %v", err)
