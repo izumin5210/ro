@@ -6,11 +6,11 @@ import (
 	"github.com/gomodule/redigo/redis"
 	"github.com/pkg/errors"
 
-	"github.com/izumin5210/ro/types"
+	"github.com/izumin5210/ro/rq"
 )
 
 // Select implements the types.Store interface.
-func (s *ConcreteStore) Select(dest interface{}, query types.Query) error {
+func (s *ConcreteStore) Select(dest interface{}, mods ...rq.Modifier) error {
 	dt := reflect.ValueOf(dest)
 	if dt.Kind() != reflect.Ptr || dt.IsNil() {
 		return errors.New("must pass a slice ptr")
@@ -20,7 +20,7 @@ func (s *ConcreteStore) Select(dest interface{}, query types.Query) error {
 		return errors.New("must pass a slice ptr")
 	}
 
-	keys, err := s.selectKeys(query)
+	keys, err := s.selectKeys(mods)
 	if err != nil {
 		return errors.Wrap(err, "failed to select query")
 	}
