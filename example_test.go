@@ -1,4 +1,4 @@
-package ro
+package ro_test
 
 import (
 	"fmt"
@@ -6,11 +6,12 @@ import (
 
 	"github.com/gomodule/redigo/redis"
 
+	"github.com/izumin5210/ro"
 	"github.com/izumin5210/ro/rq"
 )
 
 type Post struct {
-	Model
+	ro.Model
 	ID        uint64 `redis:"id"`
 	UserID    uint64 `redis:"user_id"`
 	Title     string `redis:"title"`
@@ -33,13 +34,13 @@ func (p *Post) GetScoreMap() map[string]interface{} {
 // ----------------------------------------------------------------
 
 var (
-	postStore Store
+	postStore ro.Store
 	now       time.Time
 )
 
 func setup() {
 	now = time.Now()
-	postStore = New(pool, &Post{})
+	postStore = ro.New(pool, &Post{})
 
 	postStore.Put([]*Post{
 		{
@@ -82,7 +83,7 @@ func cleanup() {
 
 func Example_Store_Set() {
 	defer cleanup()
-	postStore = New(pool, &Post{})
+	postStore = ro.New(pool, &Post{})
 
 	postStore.Put([]*Post{
 		{

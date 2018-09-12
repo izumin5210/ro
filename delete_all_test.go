@@ -1,4 +1,4 @@
-package ro
+package ro_test
 
 import (
 	"testing"
@@ -6,6 +6,7 @@ import (
 
 	"github.com/gomodule/redigo/redis"
 
+	"github.com/izumin5210/ro"
 	"github.com/izumin5210/ro/rq"
 	rotesting "github.com/izumin5210/ro/testing"
 )
@@ -46,7 +47,7 @@ func TestRedisStore_DeleteAll(t *testing.T) {
 		},
 	}
 
-	store := New(pool, &rotesting.Post{})
+	store := ro.New(pool, &rotesting.Post{})
 	err := store.Put(posts)
 	if err != nil {
 		t.Errorf("Unexpected error: %v", err)

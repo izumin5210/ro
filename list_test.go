@@ -1,10 +1,11 @@
-package ro
+package ro_test
 
 import (
 	"reflect"
 	"testing"
 	"time"
 
+	"github.com/izumin5210/ro"
 	"github.com/izumin5210/ro/rq"
 	rotesting "github.com/izumin5210/ro/testing"
 )
@@ -12,7 +13,7 @@ import (
 func TestRedisStore_List(t *testing.T) {
 	defer teardown(t)
 
-	store := New(pool, &rotesting.Post{})
+	store := ro.New(pool, &rotesting.Post{})
 
 	now := time.Now().UTC()
 	posts := []*rotesting.Post{

@@ -1,4 +1,4 @@
-package ro
+package ro_test
 
 import (
 	"log"
@@ -12,9 +12,12 @@ var pool *rotesting.Pool
 
 func TestMain(m *testing.M) {
 	pool = rotesting.MustCreate()
-	defer pool.MustClose()
 
-	os.Exit(m.Run())
+	code := m.Run()
+
+	pool.MustClose()
+
+	os.Exit(code)
 }
 
 func teardown(t *testing.T) {
