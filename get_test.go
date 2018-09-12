@@ -1,4 +1,4 @@
-package ro
+package ro_test
 
 import (
 	"reflect"
@@ -6,12 +6,13 @@ import (
 
 	"github.com/gomodule/redigo/redis"
 
+	"github.com/izumin5210/ro"
 	rotesting "github.com/izumin5210/ro/testing"
 )
 
 func TestRedisStore_Get(t *testing.T) {
 	defer teardown(t)
-	store := New(pool, &rotesting.Post{})
+	store := ro.New(pool, &rotesting.Post{})
 	posts := []*rotesting.Post{
 		{
 			ID:    1,

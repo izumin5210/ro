@@ -1,4 +1,4 @@
-package ro
+package ro_test
 
 import (
 	"log"

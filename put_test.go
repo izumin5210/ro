@@ -1,4 +1,4 @@
-package ro
+package ro_test
 
 import (
 	"fmt"
@@ -9,6 +9,7 @@ import (
 
 	"github.com/gomodule/redigo/redis"
 
+	"github.com/izumin5210/ro"
 	rotesting "github.com/izumin5210/ro/testing"
 )
 
@@ -22,7 +23,7 @@ func TestRedisStore_Put(t *testing.T) {
 		UpdatedAt: now.UnixNano(),
 	}
 
-	store := New(pool, &rotesting.Post{})
+	store := ro.New(pool, &rotesting.Post{})
 	err := store.Put(post)
 
 	if err != nil {
@@ -101,7 +102,7 @@ func TestRedisStore_Put_WithMultipleItems(t *testing.T) {
 		},
 	}
 
-	store := New(pool, &rotesting.Post{})
+	store := ro.New(pool, &rotesting.Post{})
 	err := store.Put(posts)
 	if err != nil {
 		t.Errorf("Unexpected error: %v", err)
@@ -164,7 +165,7 @@ func TestRedisStore_Put_WhenDisableToStoreToHash(t *testing.T) {
 		UpdatedAt: now.UnixNano(),
 	}
 
-	store := New(pool, &rotesting.Post{}, WithHashStore(false))
+	store := ro.New(pool, &rotesting.Post{}, ro.WithHashStore(false))
 	err := store.Put(post)
 
 	if err != nil {
@@ -200,7 +201,7 @@ func (d *DummyWithEmptyKeySuffix) GetScoreMap() map[string]interface{} {
 }
 
 func TestRedisStore_Put_WhenKeySuffixIsEmpty(t *testing.T) {
-	store := New(pool, &DummyWithEmptyKeySuffix{}, WithHashStore(false))
+	store := ro.New(pool, &DummyWithEmptyKeySuffix{}, ro.WithHashStore(false))
 
 	dummy := &DummyWithEmptyKeySuffix{}
 	err := store.Put(dummy)
@@ -228,7 +229,7 @@ func (d *DummyWithNilScoreMap) GetKeySuffix() string                { return "te
 func (d *DummyWithNilScoreMap) GetScoreMap() map[string]interface{} { return nil }
 
 func TestRedisStore_Put_WithScoreMapIsNil(t *testing.T) {
-	store := New(pool, &DummyWithNilScoreMap{}, WithHashStore(false))
+	store := ro.New(pool, &DummyWithNilScoreMap{}, ro.WithHashStore(false))
 	dummy := &DummyWithNilScoreMap{}
 	err := store.Put(dummy)
 
@@ -257,7 +258,7 @@ func (d *DummyWithEmptyScoreKey) GetScoreMap() map[string]interface{} {
 }
 
 func TestRedisStore_Put_WithEmptyScoreKey(t *testing.T) {
-	store := New(pool, &DummyWithEmptyScoreKey{}, WithHashStore(false))
+	store := ro.New(pool, &DummyWithEmptyScoreKey{}, ro.WithHashStore(false))
 	dummy := &DummyWithEmptyScoreKey{}
 	err := store.Put(dummy)
 
@@ -286,7 +287,7 @@ func (d *DummyWithNotNumberScore) GetScoreMap() map[string]interface{} {
 }
 
 func TestRedisStore_Put_WithNotNumberScore(t *testing.T) {
-	store := New(pool, &DummyWithNotNumberScore{}, WithHashStore(false))
+	store := ro.New(pool, &DummyWithNotNumberScore{}, ro.WithHashStore(false))
 	dummy := &DummyWithNotNumberScore{}
 	err := store.Put(dummy)
 
@@ -315,7 +316,7 @@ func (d *DummyWithTooLargeScore) GetScoreMap() map[string]interface{} {
 }
 
 func TestRedisStore_Put_WithTooLargeNumberScore(t *testing.T) {
-	store := New(pool, &DummyWithTooLargeScore{}, WithHashStore(false))
+	store := ro.New(pool, &DummyWithTooLargeScore{}, ro.WithHashStore(false))
 	dummy := &DummyWithTooLargeScore{}
 	err := store.Put(dummy)
 
@@ -349,7 +350,7 @@ func (d *DummyWithStringNumberScore) GetScoreMap() map[string]interface{} {
 }
 
 func TestRedisStore_Put_WithStringNumberScore(t *testing.T) {
-	store := New(pool, &DummyWithStringNumberScore{}, WithHashStore(false))
+	store := ro.New(pool, &DummyWithStringNumberScore{}, ro.WithHashStore(false))
 	dummy := &DummyWithStringNumberScore{}
 	err := store.Put(dummy)
 
