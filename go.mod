@@ -6,12 +6,10 @@ require (
 	github.com/Nvveen/Gotty v0.0.0-20120604004816-cd527374f1e5 // indirect
 	github.com/cenkalti/backoff v2.0.0+incompatible // indirect
 	github.com/containerd/continuity v0.0.0-20180829013124-f44b615e492b // indirect
-	github.com/creasty/defaults v1.2.1
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/docker/go-connections v0.3.0 // indirect
 	github.com/docker/go-units v0.3.3 // indirect
 	github.com/fsnotify/fsnotify v1.4.7 // indirect
-	github.com/golang/go v0.0.0-20180911122522-95a11c7381e0
 	github.com/golang/protobuf v1.2.0 // indirect
 	github.com/gomodule/redigo v2.0.0+incompatible
 	github.com/google/go-cmp v0.2.0 // indirect
