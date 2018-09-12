@@ -12,6 +12,7 @@ require (
 	github.com/gomodule/redigo v2.0.0+incompatible
 	github.com/google/go-cmp v0.2.0 // indirect
 	github.com/gotestyourself/gotestyourself v2.1.0+incompatible // indirect
+	github.com/kr/pretty v0.1.0 // indirect
 	github.com/lib/pq v1.0.0 // indirect
 	github.com/onsi/gomega v1.4.2 // indirect
 	github.com/opencontainers/go-digest v1.0.0-rc1 // indirect
