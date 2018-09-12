@@ -1,6 +1,7 @@
 package ro_test
 
 import (
+	"context"
 	"fmt"
 	"time"
 
@@ -42,7 +43,7 @@ func setup() {
 	now = time.Now()
 	postStore = ro.New(pool, &Post{})
 
-	postStore.Put([]*Post{
+	postStore.Put(context.TODO(), []*Post{
 		{
 			ID:        1,
 			UserID:    1,
@@ -85,7 +86,7 @@ func Example_Store_Set() {
 	defer cleanup()
 	postStore = ro.New(pool, &Post{})
 
-	postStore.Put([]*Post{
+	postStore.Put(context.TODO(), []*Post{
 		{
 			ID:        1,
 			UserID:    1,
@@ -125,7 +126,7 @@ func Example_Store_Get() {
 	defer cleanup()
 
 	post := &Post{ID: 1}
-	postStore.Get(post)
+	postStore.Get(context.TODO(), post)
 	fmt.Println(post.Body)
 	// Output:
 	// This is a post 1
@@ -136,7 +137,7 @@ func Example_Store_List() {
 	defer cleanup()
 
 	posts := []*Post{}
-	postStore.List(&posts, rq.Key("recent"), rq.GtEq(now.UnixNano()), rq.Reverse())
+	postStore.List(context.TODO(), &posts, rq.Key("recent"), rq.GtEq(now.UnixNano()), rq.Reverse())
 	fmt.Println(posts[0].Body)
 	fmt.Println(posts[1].Body)
 	// Output:
@@ -148,7 +149,7 @@ func Example_Store_Count() {
 	setup()
 	defer cleanup()
 
-	cnt, _ := postStore.Count(rq.Key("user", 1), rq.LtEq(now.UnixNano()))
+	cnt, _ := postStore.Count(context.TODO(), rq.Key("user", 1), rq.LtEq(now.UnixNano()))
 	fmt.Println(cnt)
 	// Output:
 	// 2

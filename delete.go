@@ -1,6 +1,7 @@
 package ro
 
 import (
+	"context"
 	"reflect"
 
 	"github.com/gomodule/redigo/redis"
@@ -8,7 +9,7 @@ import (
 )
 
 // Delete implements the types.Store interface.
-func (s *redisStore) Delete(src interface{}) error {
+func (s *redisStore) Delete(ctx context.Context, src interface{}) error {
 	keys := []string{}
 
 	rv := reflect.ValueOf(src)
@@ -36,16 +37,18 @@ func (s *redisStore) Delete(src interface{}) error {
 		keys = append(keys, key)
 	}
 
-	err := s.deleteByKeys(keys)
+	err := s.deleteByKeys(ctx, keys)
 	if err != nil {
 		return errors.Wrapf(err, "failed to remove by keys %v", keys)
 	}
 	return nil
 }
 
-func (s *redisStore) deleteByKeys(keys []string) error {
-	conn := s.pool.Get()
-	defer conn.Close()
+func (s *redisStore) deleteByKeys(ctx context.Context, keys []string) error {
+	conn, err := s.pool.GetContext(ctx)
+	if err != nil {
+		return errors.Wrap(err, "failed to acquire a connection")
+	}
 
 	keysByZsetKey := map[string][]string{}
 	for _, k := range keys {
@@ -58,7 +61,7 @@ func (s *redisStore) deleteByKeys(keys []string) error {
 		}
 	}
 
-	err := conn.Send("MULTI")
+	err = conn.Send("MULTI")
 	if err != nil {
 		return errors.Wrap(err, "faild to send MULTI command")
 	}

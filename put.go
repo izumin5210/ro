@@ -1,6 +1,7 @@
 package ro
 
 import (
+	"context"
 	"fmt"
 	"reflect"
 	"strconv"
@@ -10,10 +11,11 @@ import (
 )
 
 // Put implements the types.Store interface.
-func (s *redisStore) Put(src interface{}) error {
-	var err error
-
-	conn := s.pool.Get()
+func (s *redisStore) Put(ctx context.Context, src interface{}) error {
+	conn, err := s.pool.GetContext(ctx)
+	if err != nil {
+		return errors.Wrap(err, "failed to acquire a connection")
+	}
 	defer conn.Close()
 
 	err = conn.Send("MULTI")

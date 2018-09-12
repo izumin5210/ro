@@ -1,14 +1,19 @@
 package ro
 
 import (
+	"context"
+
 	"github.com/gomodule/redigo/redis"
 	"github.com/pkg/errors"
 )
 
-func (s *redisStore) Get(dests ...Model) error {
+func (s *redisStore) Get(ctx context.Context, dests ...Model) error {
 	var err error
 
-	conn := s.pool.Get()
+	conn, err := s.pool.GetContext(ctx)
+	if err != nil {
+		return errors.Wrap(err, "failed to acquire a connection")
+	}
 	defer conn.Close()
 
 	keys := make([]string, len(dests), len(dests))

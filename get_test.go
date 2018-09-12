@@ -1,6 +1,7 @@
 package ro_test
 
 import (
+	"context"
 	"reflect"
 	"testing"
 
@@ -33,7 +34,7 @@ func TestRedisStore_Get(t *testing.T) {
 
 	t.Run("single get", func(t *testing.T) {
 		gotPost := &rotesting.Post{ID: 2}
-		err := store.Get(gotPost)
+		err := store.Get(context.TODO(), gotPost)
 
 		if err != nil {
 			t.Errorf("Unexpected error: %v", err)
@@ -45,7 +46,7 @@ func TestRedisStore_Get(t *testing.T) {
 
 	t.Run("multi get", func(t *testing.T) {
 		gotPosts := []*rotesting.Post{{ID: 2}, {ID: 1}}
-		err := store.Get(gotPosts[0], gotPosts[1])
+		err := store.Get(context.TODO(), gotPosts[0], gotPosts[1])
 
 		if err != nil {
 			t.Errorf("Unexpected error: %v", err)

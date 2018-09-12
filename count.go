@@ -1,6 +1,8 @@
 package ro
 
 import (
+	"context"
+
 	"github.com/gomodule/redigo/redis"
 	"github.com/pkg/errors"
 
@@ -8,8 +10,11 @@ import (
 )
 
 // Count implements the types.Store interface.
-func (s *redisStore) Count(mods ...rq.Modifier) (int, error) {
-	conn := s.pool.Get()
+func (s *redisStore) Count(ctx context.Context, mods ...rq.Modifier) (int, error) {
+	conn, err := s.pool.GetContext(ctx)
+	if err != nil {
+		return 0, errors.Wrap(err, "failed to acquire a connection")
+	}
 	defer conn.Close()
 
 	cmd, err := s.injectKeyPrefix(rq.Count(mods...)).Build()

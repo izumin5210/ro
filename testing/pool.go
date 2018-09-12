@@ -1,6 +1,7 @@
 package rotesting
 
 import (
+	"context"
 	"fmt"
 	"log"
 
@@ -52,6 +53,11 @@ func MustCreate() *Pool {
 // Get gets a connection with redis
 func (p *Pool) Get() redis.Conn {
 	return p.redisPool.Get()
+}
+
+// GetContext gets a connection with redis
+func (p *Pool) GetContext(ctx context.Context) (redis.Conn, error) {
+	return p.redisPool.GetContext(ctx)
 }
 
 // Cleanup remove all data in redis
