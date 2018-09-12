@@ -109,7 +109,7 @@ func (q *Query) Build() (*Command, error) {
 		}
 		return cmd, nil
 	default:
-		return nil, newQueryError(q, "unknown query type")
+		return nil, errors.WithStack(newQueryError(q, "unknown query type"))
 	}
 }
 
