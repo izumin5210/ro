@@ -1,6 +1,7 @@
 package ro_test
 
 import (
+	"context"
 	"testing"
 	"time"
 
@@ -49,7 +50,7 @@ func TestRedisStore_Count(t *testing.T) {
 	}
 
 	for _, p := range posts {
-		err := store.Put(p)
+		err := store.Put(context.TODO(), p)
 
 		if err != nil {
 			t.Fatalf("Unexpected error: %v", err)
@@ -122,7 +123,7 @@ func TestRedisStore_Count(t *testing.T) {
 
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
-			cnt, err := store.Count(c.mods...)
+			cnt, err := store.Count(context.TODO(), c.mods...)
 
 			if err != nil {
 				t.Errorf("Unexpected error: %v", err)

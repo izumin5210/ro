@@ -1,6 +1,7 @@
 package ro_test
 
 import (
+	"context"
 	"testing"
 	"time"
 
@@ -48,12 +49,13 @@ func TestRedisStore_DeleteAll(t *testing.T) {
 	}
 
 	store := ro.New(pool, &rotesting.Post{})
-	err := store.Put(posts)
+	err := store.Put(context.TODO(), posts)
 	if err != nil {
 		t.Errorf("Unexpected error: %v", err)
 	}
 
 	err = store.DeleteAll(
+		context.TODO(),
 		rq.Key("recent"),
 		rq.Gt(now.Add(-2*60*time.Second).UnixNano()),
 		rq.LtEq(now.Add(1*60*time.Second).UnixNano()),

@@ -1,6 +1,7 @@
 package ro
 
 import (
+	"context"
 	"reflect"
 
 	"github.com/gomodule/redigo/redis"
@@ -10,7 +11,7 @@ import (
 )
 
 // List implements the types.Store interface.
-func (s *redisStore) List(dest interface{}, mods ...rq.Modifier) error {
+func (s *redisStore) List(ctx context.Context, dest interface{}, mods ...rq.Modifier) error {
 	dt := reflect.ValueOf(dest)
 	if dt.Kind() != reflect.Ptr || dt.IsNil() {
 		return errors.New("must pass a slice ptr")
@@ -20,12 +21,15 @@ func (s *redisStore) List(dest interface{}, mods ...rq.Modifier) error {
 		return errors.New("must pass a slice ptr")
 	}
 
-	keys, err := s.selectKeys(mods)
+	keys, err := s.selectKeys(ctx, mods)
 	if err != nil {
 		return errors.Wrap(err, "failed to select query")
 	}
 
-	conn := s.pool.Get()
+	conn, err := s.pool.GetContext(ctx)
+	if err != nil {
+		return errors.Wrap(err, "failed to acquire a connection")
+	}
 	defer conn.Close()
 
 	for _, key := range keys {

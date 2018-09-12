@@ -1,6 +1,7 @@
 package ro_test
 
 import (
+	"context"
 	"testing"
 	"time"
 
@@ -35,12 +36,12 @@ func TestRedisStore_Delete(t *testing.T) {
 	}
 
 	store := ro.New(pool, &rotesting.Post{})
-	err := store.Put(posts)
+	err := store.Put(context.TODO(), posts)
 	if err != nil {
 		t.Errorf("Unexpected error: %v", err)
 	}
 
-	err = store.Delete(posts[0])
+	err = store.Delete(context.TODO(), posts[0])
 	if err != nil {
 		t.Errorf("Unexpected error: %v", err)
 	}
@@ -98,12 +99,12 @@ func TestRedisStore_Delete_WithMultipleItems(t *testing.T) {
 	}
 
 	store := ro.New(pool, &rotesting.Post{})
-	err := store.Put(posts)
+	err := store.Put(context.TODO(), posts)
 	if err != nil {
 		t.Errorf("Unexpected error: %v", err)
 	}
 
-	err = store.Delete([]*rotesting.Post{posts[0], posts[2]})
+	err = store.Delete(context.TODO(), []*rotesting.Post{posts[0], posts[2]})
 	if err != nil {
 		t.Errorf("Unexpected error: %v", err)
 	}
@@ -169,12 +170,12 @@ func TestRedisStore_Remove_WhenDisableToStoreToHash(t *testing.T) {
 	}
 
 	store := ro.New(pool, &rotesting.Post{}, ro.WithHashStore(false))
-	err := store.Put(posts)
+	err := store.Put(context.TODO(), posts)
 	if err != nil {
 		t.Errorf("Unexpected error: %v", err)
 	}
 
-	err = store.Delete(posts[0])
+	err = store.Delete(context.TODO(), posts[0])
 	if err != nil {
 		t.Errorf("Unexpected error: %v", err)
 	}

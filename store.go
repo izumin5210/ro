@@ -1,6 +1,7 @@
 package ro
 
 import (
+	"context"
 	"reflect"
 
 	"github.com/gomodule/redigo/redis"
@@ -10,17 +11,17 @@ import (
 
 // Store is an interface for providing CRUD operations for objects
 type Store interface {
-	List(dest interface{}, mods ...rq.Modifier) error
-	Get(dests ...Model) error
-	Put(src interface{}) error
-	Delete(src interface{}) error
-	DeleteAll(mods ...rq.Modifier) error
-	Count(mods ...rq.Modifier) (int, error)
+	List(ctx context.Context, dest interface{}, mods ...rq.Modifier) error
+	Get(ctx context.Context, dests ...Model) error
+	Put(ctx context.Context, src interface{}) error
+	Delete(ctx context.Context, src interface{}) error
+	DeleteAll(ctx context.Context, mods ...rq.Modifier) error
+	Count(ctx context.Context, mods ...rq.Modifier) (int, error)
 }
 
 // Pool is a pool of redis connections.
 type Pool interface {
-	Get() redis.Conn
+	GetContext(context.Context) (redis.Conn, error)
 }
 
 type redisStore struct {
