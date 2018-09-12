@@ -55,7 +55,13 @@ func (s *redisStore) selectKeys(ctx context.Context, mods []rq.Modifier) ([]stri
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
-	return redis.Strings(conn.Do(cmd.Name, cmd.Args...))
+
+	keys, err := redis.Strings(conn.Do(cmd.Name, cmd.Args...))
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+
+	return keys, nil
 }
 
 func (s *redisStore) injectKeyPrefix(q *rq.Query) *rq.Query {

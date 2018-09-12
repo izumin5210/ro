@@ -8,8 +8,6 @@ import (
 )
 
 func (s *redisStore) Get(ctx context.Context, dests ...Model) error {
-	var err error
-
 	conn, err := s.pool.GetContext(ctx)
 	if err != nil {
 		return errors.Wrap(err, "failed to acquire a connection")
@@ -46,5 +44,5 @@ func (s *redisStore) Get(ctx context.Context, dests ...Model) error {
 		}
 	}
 
-	return err
+	return nil
 }
