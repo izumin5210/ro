@@ -45,14 +45,6 @@
   revision = "f44b615e492bdfb371aae2f76ec694d9da1db537"
 
 [[projects]]
-  digest = "1:83a1a1cf1de52fbc4fb81327712f21bac825204d52424ac8c8b4d110be94eacb"
-  name = "github.com/creasty/defaults"
-  packages = ["."]
-  pruneopts = ""
-  revision = "a7e48e2230891fc7456c8ab918c424c5b06c3192"
-  version = "v1.2.1"
-
-[[projects]]
   digest = "1:a5ecc2e70260a87aa263811281465a5effcfae8a54bac319cee87c4625f04d63"
   name = "github.com/docker/go-connections"
   packages = ["nat"]
@@ -157,19 +149,19 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:b2d8b39397ca07929a3de3a3fd2b6ca4c8d48e9cadaa7cf2b083e27fd9e78107"
+  digest = "1:61a86f0be8b466d6e3fbdabb155aaa4006137cb5e3fd3b949329d103fa0ceb0f"
   name = "golang.org/x/crypto"
   packages = ["ssh/terminal"]
   pruneopts = ""
-  revision = "0709b304e793a5edb4a2c0145f281ecdc20838a4"
+  revision = "0e37d006457bf46f9e6692014ba72ef82c33022c"
 
 [[projects]]
   branch = "master"
-  digest = "1:782723d6fc27d202f1943219d68d58b3f6bcab6212c85294b1ddd8b586b1d356"
+  digest = "1:fbdbb6cf8db3278412c9425ad78b26bb8eb788181f26a3ffb3e4f216b314f86a"
   name = "golang.org/x/net"
   packages = ["context"]
   pruneopts = ""
-  revision = "161cd47e91fd58ac17490ef4d742dc98bb4cf60e"
+  revision = "26e67e76b6c3f6ce91f7c52def5af501b4e0f3a2"
 
 [[projects]]
   branch = "master"
@@ -194,7 +186,6 @@
   analyzer-name = "dep"
   analyzer-version = 1
   input-imports = [
-    "github.com/creasty/defaults",
     "github.com/gomodule/redigo/redis",
     "github.com/pkg/errors",
     "gopkg.in/ory-am/dockertest.v3",

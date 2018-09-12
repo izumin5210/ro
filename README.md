@@ -10,7 +10,6 @@
 
 ```go
 type Post struct {
-	ro.Model
 	ID        uint64 `redis:"id"`
 	UserID    int `redis:"user_id"`
 	Title     string `redis:"title"`
@@ -40,9 +39,10 @@ func main() {
 
 	store := ro.New(pool.Get, &Post{})
 	now := time.Now()
+	ctx := context.Background()
 
 	// Posts will be stored as Hash, and user:{{userID}} and created_at are stored as OrderedSet
-	store.Set([]*Post{
+	store.Put(ctx, []*Post{
 		{
 			ID:        1,
 			UserID:    1,
@@ -67,13 +67,13 @@ func main() {
 	})
 
 	post := &Post{ID: 1}
-	_ := store.Get(post)
+	_ := store.Get(ctx, post)
 	fmt.Println("%v", post)
 	// Output:
 	// Post{ID: 1, Title: "post 1", Body: "This is a post 1"}
 
 	posts := []*Post{}
-	_ := store.Select(&posts, store.Query("created_at").GtEq(now.UnixNano()).Reverse())
+	_ := store.List(ctx, &posts, rq.Key("created_at"), rq.GtEq(now.UnixNano()), rq.Reverse())
 	fmt.Println("%v", posts[0])
 	// Output:
 	// Post{ID: 3, UserID: 1, Title: "post 3", Body: "This is a post 3"}
@@ -81,7 +81,7 @@ func main() {
 	// Output:
 	// Post{ID: 1, UserID: 1, Title: "post 1", Body: "This is a post 1"}
 
-	cnt, _ := store.Count(store.Query("user:1").Gt(now.UnixNano()).Reverse())
+	cnt, _ := store.Count(ctx, rq.Key("user", 1), rq.Gt(now.UnixNano()), rq.Reverse())
 	fmt.Println(cnt)
 	// Output:
 	// 1
