@@ -18,7 +18,17 @@ func (s *redisStore) Put(ctx context.Context, src interface{}) error {
 	}
 	defer conn.Close()
 
-	err = conn.Send("MULTI")
+	err = s.PutConn(conn, src)
+	if err != nil {
+		return errors.WithStack(err)
+	}
+
+	return nil
+}
+
+// Put implements the types.Store interface.
+func (s *redisStore) PutConn(conn redis.Conn, src interface{}) error {
+	err := conn.Send("MULTI")
 	if err != nil {
 		return errors.Wrap(err, "faild to send MULTI command")
 	}
@@ -26,13 +36,13 @@ func (s *redisStore) Put(ctx context.Context, src interface{}) error {
 	rv := reflect.ValueOf(src)
 	if rv.Kind() == reflect.Slice {
 		for i := 0; i < rv.Len(); i++ {
-			err = s.set(conn, rv.Index(i))
+			err = s.put(conn, rv.Index(i))
 			if err != nil {
 				break
 			}
 		}
 	} else {
-		err = s.set(conn, rv)
+		err = s.put(conn, rv)
 	}
 
 	if err != nil {
@@ -47,7 +57,7 @@ func (s *redisStore) Put(ctx context.Context, src interface{}) error {
 	return nil
 }
 
-func (s *redisStore) set(conn redis.Conn, src reflect.Value) error {
+func (s *redisStore) put(conn redis.Conn, src reflect.Value) error {
 	m, err := s.toModel(src)
 	if err != nil {
 		return errors.Wrap(err, "failed to convert to model")

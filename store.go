@@ -14,6 +14,7 @@ type Store interface {
 	List(ctx context.Context, dest interface{}, mods ...rq.Modifier) error
 	Get(ctx context.Context, dests ...Model) error
 	Put(ctx context.Context, src interface{}) error
+	PutConn(conn redis.Conn, src interface{}) error
 	Delete(ctx context.Context, src interface{}) error
 	DeleteAll(ctx context.Context, mods ...rq.Modifier) error
 	Count(ctx context.Context, mods ...rq.Modifier) (int, error)
